@@ -181,4 +181,49 @@ function write_path(history, maze, life)
   return maze, _write_path(history, x, y, life)
 end
 
+ -- return move for x parameter "L" or "R"
+function get_move_x(x)
+  local position
+    if  x == -1  then
+      position="L"
+    elseif x == 1  then
+      position="R"
+    else 
+      print("Error")
+    end
+    return position
+  end
+  
+  -- return move for y parameter "D" or "U"
+  function get_move_y(y)
+  local position
+    if   y==1 then
+      position= "D"
+    elseif   y==-1 then
+      position= "U"
+    else 
+      print("Error")
+    end
+    return position
+  end
+  
+  
+-- list of move available 
+function move_available(maze,y,x)
+   local available = {}
+   if maze[y][x] == "m" or maze[y][x]==nil then
+     return available
+   end
+     for z= -1,1,2 do
+       if maze[y][x+z] ~= "m" and maze[y][x+z]~=nil then
+        available[#available+1]=get_move_x(z)
+      end
+      if maze[y+z][x] ~= "m" and maze[y+z][x]~=nil then
+        
+        available[#available +1 ]=get_move_y(z)
+       
+      end
+   end
+   return available
+ end
 -- start, maze = init_game_data("mazes/maze_1.txt")
