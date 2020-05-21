@@ -18,15 +18,14 @@ function lines_from(file)
   return lines
 end
 
--- TODO: make integers numbers
 -- builds a maze from the table containing lines of the file
 function build_maze(lines_table)
   local maze = {}
   for i=1,#lines-1 do
     row = {}
     -- need to skip first row: reserved for vitality
-    -- for cell in string.gmatch(lines[i + 1], "%S+") do
     for cell in lines[i + 1]:gmatch"." do
+      if tonumber(cell) ~= nil then cell = tonumber(cell) end
       row[#row + 1] = cell
     end
     maze[i] = row
