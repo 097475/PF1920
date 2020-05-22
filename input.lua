@@ -268,14 +268,14 @@ function move_encode(encode_state, maze)
    local new_life= life_update(life,maze,y+delta_y,x+delta_x)
    move[ encode(new_life, x + delta_x, y + delta_y) ] = {available[i], new_life - life}
   end
-  for key,value in pairs(move) do 
+  --for key,value in pairs(move) do 
     
-     for j, w in ipairs(value) do
-       print(key,w)
-    end
-  end
+  --   for j, w in ipairs(value) do
+  --     print(key,w)
+  --  end
+  --end
   return move
   end
 
-start, maze = init_game_data("mazes/maze_1.txt")
-print(move_encode('3|2|5', maze))
+--start, maze = init_game_data("mazes/maze_1.txt")
+--print(move_encode('3|2|5', maze))
