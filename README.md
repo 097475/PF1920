@@ -7,7 +7,7 @@ X 4. Funzione che genera lo stato iniziale
 6. metatable per il labirinto (?)
 7. algoritmi e euristiche: (A *, BFS, Best-First, DFS, IDFS, B*, Djikstra)
   - A*
-  X BFS
+  - X BFS
   - Best-First
   - DFS
   - IDFS
