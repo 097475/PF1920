@@ -228,51 +228,45 @@ function move_available(maze,y,x)
  end
  
  -- update the life according to logic of program
-function life_update(life,maze,x,y)
-  
+function life_update(life,maze,y,x)
   local new_life
-  if maze[x][y] == "0" then
-    new_life=life
-  end
-  if maze[x][y] >= "1" and maze[x][y]<="4" then
-     new_life=life + maze[x][y]
-  end
-  if maze[x][y] >= "5" and maze[x][y]<= "8"   then
-     new_life=life+4-maze[x][y]
-  end
-  if maze[x][y] =="9"   then
-     new_life=life*2
-  end
-  if maze[x][y] == 'f'  then
-     new_life=life/2
-     if new_life==1 then
-      new_life=0
-     end
+  local cell = maze[y][x]
+  if tonumber(cell) ~= nil then
+    if cell == 0 then
+      new_life=life
+    elseif cell >= 1 and cell<= 4 then
+      new_life=life + cell
+    elseif cell >= 5 and cell<= 8 then
+      new_life=life+4-cell
+    else
+      new_life=life*2
+    end
+  else
+    if cell == 'f'  then
+      new_life=life/2
+      if new_life==1 then
+       new_life=0
+      end
+    elseif cell == 'p' then
+      new_life = 0
+    else
+      new_life = life
+    end
   end
   return new_life
 end
 
---count the difference between the previous and the updated life counts
-function life_difference(life, new_life)
-  local difference
-  if life >= new_life then
-    difference= life-new_life
-  else
-    difference=new_life-life
-    end
-    return difference
-  end
 -- return move available in a specific format with life,position and move, life change
 function move_encode(encode_state, maze)
   life,x,y=decode(encode_state)
   local move={}
   local available={}
-  available= move_available(maze,x,y)
-  print_array(available)
+  available= move_available(maze,y,x)
+  --print_array(available)
   for i=1,#available do
     delta_x, delta_y= move_vector(available[i])
-   local new_life= life_update(life,maze,x+delta_y,y+delta_x)
-   move[ encode(new_life,x+delta_x,y+delta_y) ]={available[i],life_difference(life,new_life)}
+   local new_life= life_update(life,maze,y+delta_y,x+delta_x)
+   move[ encode(new_life, x + delta_x, y + delta_y) ] = {available[i], new_life - life}
   end
   for key,value in pairs(move) do 
     
@@ -283,4 +277,5 @@ function move_encode(encode_state, maze)
   return move
   end
 
--- start, maze = init_game_data("mazes/maze_1.txt")
+start, maze = init_game_data("mazes/maze_1.txt")
+print(move_encode('3|2|5', maze))
