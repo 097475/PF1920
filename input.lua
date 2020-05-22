@@ -277,5 +277,9 @@ function move_encode(encode_state, maze)
   return move
   end
 
+function initial_state(start)
+ local encode= encode(start.vitality, start.entry_point.y,start.entry_point.x)
+  return encode
+  end
 start, maze = init_game_data("mazes/maze_1.txt")
 print(move_encode('3|2|5', maze))
