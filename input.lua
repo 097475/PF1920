@@ -278,8 +278,8 @@ function move_encode(encode_state, maze)
   end
 
 function initial_state(start)
- local encode= encode(start.vitality, start.entry_point.y,start.entry_point.x)
+ local encode= encode(start.vitality, start.entry_point.x,start.entry_point.y)
   return encode
   end
-start, maze = init_game_data("mazes/maze_1.txt")
-print(move_encode('3|2|5', maze))
+-- start, maze = init_game_data("mazes/maze_1.txt")
+-- print(move_encode('3|2|5', maze))
