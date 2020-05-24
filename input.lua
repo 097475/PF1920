@@ -38,7 +38,7 @@ function find_points(maze, symbol)
   local points = {}
   for row_key, row_table in pairs(maze) do
     for col_key, element in pairs(row_table) do
-      if element == symbol and col == nil then
+      if element == symbol then
         local points_index = #points + 1
         points[points_index] = {}
         points[points_index].x = col_key
