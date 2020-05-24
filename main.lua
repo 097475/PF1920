@@ -167,22 +167,10 @@ function draw_moves(history, current_move)
       end
     end
   end
-
-
-
-    
-  
---  local i = 2
---  while i < current_move do
---    i = i + 1
---    draw_move(x, y, history[i][1])
---  end
 end
 
 function generate_tilemap(maze)
   local tilemap = {}
-  
-  
   for i,row in ipairs(maze) do
     table.insert(tilemap, {})
     for j,tile in ipairs(row) do
@@ -210,18 +198,18 @@ function reset_vitality()
 end
 
 function game_load()
-    history = {{"U", 2},{"R", 1},{"U", 3},{"R", 0},{"R", -4},{"R", 1},{"D", 0}}
     current_move = 0
     index = 0
-    
+    ------------------------------------------------- call the rest of the program here
     start, maze = init_game_data(filepath)
     life = start.vitality
+    history = {{"U", 2},{"R", 1},{"U", 3},{"R", 0},{"R", -4},{"R", 1},{"D", 0}}
+    -------------------------------------------------
     
     image = love.graphics.newImage(TILESET)
     local image_width = image:getWidth()
     local image_height = image:getHeight()
 
-  --TODO: generalize indexes
     quads = {}
     for i=0, rows do
       for j=0, cols do
@@ -229,22 +217,21 @@ function game_load()
       end
     end
     
-    
   tilemap = generate_tilemap(maze)
 end
 
 function love.load()
   gamestate = "menu"
-  filepath = "maze.txt"
+  filepath = "mazes/maze_1.txt"
   love.graphics.setLineWidth(5)
   love.graphics.setLineStyle("rough")
   love.window.maximize()
 end
 
 function menu_update() end
+
 function game_update() 
   while index < current_move do
-    print(index)
     index = index + 1
     life = life + history[index][2]
   end
@@ -333,7 +320,6 @@ function love.textinput(text)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
-  --love.graphics.getWidth()/2 - 150, 250, 300,100
   if gamestate == "menu" and x > love.graphics.getWidth()/2 - 150 and x < x + 300 and y > 250 and y < 250 + 100  then
     game_load()
     gamestate = "game"
