@@ -214,6 +214,7 @@ function love.load(args)
       table.insert(arrow_quads, {x = j * width, y = i * height, w = width, h = height})
     end
   end
+  love.window.setTitle("Maze solver")
   love.window.setMode(1000, 500, {resizable=true})
   love.graphics.setBackgroundColor(0.4, 0.88, 1.0)
   Slab.Initialize(args)
@@ -291,7 +292,7 @@ function love.update(dt)
   Slab.Update(dt)
   create_menu()
   user_input()
-	Slab.BeginWindow('MainWindow', {Title = "Maze Solver", AutoSizeWindow = false, W = love.graphics.getWidth( ) + 1, H = love.graphics.getHeight()-38, X = -2, Y = 17, NoSavedSettings = true, AllowMove = false})
+	Slab.BeginWindow('MainWindow', {Title = nil, AutoSizeWindow = false, W = love.graphics.getWidth( ) + 1, H = love.graphics.getHeight()-38, X = -2, Y = 17, NoSavedSettings = true, AllowMove = false})
   if filepath ~= "" then
     game_update()
     game_draw()
