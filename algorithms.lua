@@ -18,7 +18,7 @@ function bfs(maze, entry_point_encoded, exit_y, exit_x)
     local path
     local directions_path
     paths_queue:enqueue({entry_point_encoded})
-    directions_queue:enqueue({{"",0}})
+    directions_queue:enqueue({{"_",0}})
     entry_life, entry_x, entry_y = decode(entry_point_encoded)
     table.insert(visited, {entry_y, entry_x})
     while not paths_queue:isEmpty() do
@@ -95,13 +95,7 @@ end
  -- entry_life, entry_x, entry_y = decode(entry_point_encoded)
 
 start, maze = init_game_data("mazes/maze_1.txt")
-print_table(maze)
-path, history = bfs(maze,initial_state(start),4,6)
---path,history=dfs(maze,initial_state(start),4,6)
-print(path)
-for _, d in pairs(path) do
-    print(d)
-end
+path, history = bfs(maze:get_maze(),initial_state(start),4,6)
 
 for _, d in ipairs(history) do
   print(d[1] .. ", " .. d[2])
