@@ -282,4 +282,4 @@ function initial_state(start)
   return encode
   end
 -- start, maze = init_game_data("mazes/maze_1.txt")
--- print(move_encode('3|2|5', maze))
+--a=(move_encode('3|2|5', maze))
