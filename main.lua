@@ -186,6 +186,7 @@ function game_load()
   current_move = 0
   index = 0
   start, maze = init_game_data(filepath)
+  maze = maze:get_maze()
   life = start.vitality
   ------------------------------------------------- call the rest of the program here, the program should return the path in this format
   history = {{"U", 2},{"R", 1},{"U", 3},{"R", 0},{"R", -4},{"R", 1},{"D", 0}}
