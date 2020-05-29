@@ -60,3 +60,18 @@ end
 function Maze:get_maze()
     return self.rows
 end
+
+function Maze:get_walkable_cells()
+    local points = {}
+    for row_key, row_table in pairs(self.rows) do
+        for col_key, element in pairs(row_table) do
+        if element ~= "m" then
+            local points_index = #points + 1
+            points[points_index] = {}
+            points[points_index].x = col_key
+            points[points_index].y = row_key
+        end
+        end
+    end
+    return points
+end
