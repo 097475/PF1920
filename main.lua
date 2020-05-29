@@ -264,11 +264,26 @@ function create_menu()
         if Slab.MenuItem("Open") then
           openDialog = true
         end
+        if Slab.MenuItem("Save") then
+        end
         Slab.Separator()
         if Slab.MenuItem("Quit") then
             love.event.quit()
         end
         Slab.EndMenu()
+    end
+    if Slab.BeginMenu("Solve") then
+      if Slab.MenuItem("Depth-First Search") then
+      end
+      if Slab.MenuItem("Breadth-First Search") then
+      end  
+      if Slab.MenuItem("Bidirectional Search") then
+      end  
+      if Slab.MenuItem("Best-First Search") then
+      end
+      if Slab.MenuItem("A* Search") then
+      end
+      Slab.EndMenu()
     end
     Slab.EndMenu()
   end
@@ -292,7 +307,7 @@ function love.update(dt)
   Slab.Update(dt)
   create_menu()
   user_input()
-	Slab.BeginWindow('MainWindow', {Title = nil, AutoSizeWindow = false, W = love.graphics.getWidth( ) + 1, H = love.graphics.getHeight()-38, X = -2, Y = 17, NoSavedSettings = true, AllowMove = false})
+	Slab.BeginWindow('MainWindow', {Title = nil, AutoSizeWindow = false, W = love.graphics.getWidth( ) + 1, H = love.graphics.getHeight()-20, X = -2, Y = 17, NoSavedSettings = true, AllowMove = false})
   if filepath ~= "" then
     game_update()
     game_draw()
