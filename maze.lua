@@ -119,6 +119,6 @@ function init_game_data(filename)
   return start, maze
 end
 
---start, maze = init_game_data("mazes/maze_1.txt")
+--local start, maze = init_game_data("mazes/maze_1.txt")
 --print(start)
 --print(maze)
