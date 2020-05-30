@@ -236,7 +236,10 @@ end
 -- function that draws the actual window contents: the maze and the path
 function game_draw() 
   Slab.Text("Life: " .. life)
-  
+  if history then
+      Slab.SameLine()
+      Slab.Text("\tSteps: " .. current_move)
+  end
   Slab.Text("Keys: [SPACE] -> Execute one step \t [ENTER] -> Execute full path \t [BACKSPACE] -> Backtrack one step \t [DELETE] -> Backtrack all steps")
   
   for i,row in ipairs(tilemap) do
@@ -278,19 +281,19 @@ function create_menu()
         Slab.EndMenu()
     end
     if Slab.BeginMenu("Solve") then
-      if Slab.MenuItem("Depth-First Search") then
+      if Slab.MenuItem("Depth-First Search")  and maze then
         run_algorithm(dfs)
       end
-      if Slab.MenuItem("Breadth-First Search") then
+      if Slab.MenuItem("Breadth-First Search") and maze then
         run_algorithm(bfs)
       end  
-      if Slab.MenuItem("Bidirectional Search") then
+      if Slab.MenuItem("Bidirectional Search") and maze then
       end  
-      if Slab.MenuItem("Best-First Search") then
+      if Slab.MenuItem("Best-First Search") and maze then
       end
-      if Slab.MenuItem("A* Search") then
+      if Slab.MenuItem("A* Search") and maze then
       end
-      if Slab.MenuItem("Dijkstra's Algorithm") then
+      if Slab.MenuItem("Dijkstra's Algorithm") and maze then
         run_algorithm(dijkstra)
       end
       Slab.EndMenu()
@@ -340,7 +343,7 @@ function user_input()
         current_move = current_move + 1
       elseif Slab.IsKeyPressed("return") then
         current_move = #history
-      elseif Slab.IsKeyPressed("backspace") then
+      elseif Slab.IsKeyPressed("backspace") and current_move > 0 then
         current_move = current_move - 1
         reset_vitality()
       elseif Slab.IsKeyPressed("delete") then

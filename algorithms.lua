@@ -198,22 +198,22 @@ function create_solver(algorithm)
   return solve
 end
 
-start, maze = init_game_data("mazes/maze_1.txt")
+--start, maze = init_game_data("mazes/maze_1.txt")
 --path, history = bfs(maze:get_maze(),initial_state(start),2,10)
 --path, history = dfs(maze:get_maze(),initial_state(start),4,6)
-path, _history = dijkstra(maze,initial_state(start),4,6)
+--path, _history = dijkstra(maze,initial_state(start),4,6)
 
-for _, d in pairs(path) do
-  print(d)
-end
+--for _, d in pairs(path) do
+--  print(d)
+--end
 
-for _, d in pairs(_history) do
-  print(d.move, d.life_change)
-end
+--for _, d in pairs(_history) do
+--  print(d.move, d.life_change)
+--end
 
-print("---")
+--print("---")
 
-best_history = create_solver(dfs)("mazes/maze_1.txt")
-for _, d in pairs(best_history) do
-  print(d.move, d.life_change)
-end
+--best_history = create_solver(dfs)("mazes/maze_1.txt")
+--for _, d in pairs(best_history) do
+--  print(d.move, d.life_change)
+--end
