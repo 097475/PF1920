@@ -4,7 +4,8 @@ io.stdout:setvbuf("no")
 -- used to enable lua 5.3 syntax for unpacking tables
 table.unpack = unpack
 -- import of input module
-require "input"
+require "input-output"
+require "algorithms"
 -- import of Slab library
 local Slab = require 'Slab'
 
@@ -101,7 +102,7 @@ function draw_moves(history, current_move)
   while i < current_move do
     i = i + 1
     if i == 1 then
-      move = history[i][1]
+      move = history[i].move
       delta_x, delta_y = move_vector(move)
       if delta_x == 1 then
         draw_origin((current_x - 1)*width, current_y*height, "EAST")
@@ -115,7 +116,7 @@ function draw_moves(history, current_move)
       current_x, current_y = current_x + delta_x, current_y + delta_y
       prev_delta_x, prev_delta_y = delta_x, delta_y
     elseif i <= current_move then
-      move = history[i][1]
+      move = history[i].move
       delta_x, delta_y = move_vector(move)
       if prev_delta_x ~= 0 and delta_x ~= 0 then
         draw_line((current_x - 1)*width, current_y*height, "EAST")
@@ -134,7 +135,7 @@ function draw_moves(history, current_move)
       prev_delta_x, prev_delta_y = delta_x, delta_y
     end
     if i == current_move then
-      move = history[i][1]
+      move = history[i].move
       delta_x, delta_y = move_vector(move)
       if delta_x == 1 then
         draw_destination((current_x - 1)*width, current_y*height, "EAST")
@@ -152,24 +153,20 @@ end
 
 -- Converts a maze to a matrix of tile numbers
 function generate_tilemap(maze)
-  local tilemap = {}
-  for i,row in ipairs(maze) do
-    table.insert(tilemap, {})
-    for j,tile in ipairs(row) do
-      if tile == "p" then
-        table.insert(tilemap[i], PIT)
-      elseif tile == "u" then
-        table.insert(tilemap[i], EXIT)
-      elseif tile == "i" then
-        table.insert(tilemap[i], ENTRANCE)
-      elseif tile ~= "m" then
-        table.insert(tilemap[i], NOWALL)
-      else
-        table.insert(tilemap[i], WALL)
-      end
+  function mapper (element)
+    if element == "p" then
+      return PIT
+    elseif element == "u" then
+      return EXIT
+    elseif element == "i" then
+      return ENTRANCE
+    elseif element ~= "m" then
+      return NOWALL
+    else
+      return WALL
     end
   end
-  return tilemap
+  return maze(mapper)
 end
 
 
@@ -186,12 +183,18 @@ function game_load()
   current_move = 0
   index = 0
   start, maze = init_game_data(filepath)
-  maze = maze:get_maze()
+  --maze = maze:get_maze()
   life = start.vitality
-  ------------------------------------------------- call the rest of the program here, the program should return the path in this format
-  history = {{"U", 2},{"R", 1},{"U", 3},{"R", 0},{"R", -4},{"R", 1},{"D", 0}}
-  -------------------------------------------------
-  tilemap = generate_tilemap(maze)
+  tilemap = generate_tilemap(maze):get_maze()
+end
+
+function run_algorithm(selected_algorithm)
+    history = nil
+    current_move = 0
+    index = 0
+    life = start.vitality
+    history = create_solver(selected_algorithm)(filepath)
+    table.remove(history, 1)
 end
 
 
@@ -224,9 +227,9 @@ end
 
 -- updates the life value
 function game_update() 
-  while index < current_move do
+  while index < current_move and history do
     index = index + 1
-    life = life + history[index][2]
+    life = life + history[index].life_change
   end
 end
 
@@ -243,10 +246,10 @@ function game_draw()
       Slab.SameLine()
       x,y = Slab.GetCursorPos()
       Slab.SetCursorPos(x-4, y)
-      if type(maze[i][j]) == "number" or maze[i][j] == "f" then
+      if type(maze:get_maze()[i][j]) == "number" or maze:get_maze()[i][j] == "f" then
           x,y = Slab.GetCursorPos()
           Slab.SetCursorPos(x-32, y)
-          Slab.Text(maze[i][j], {Color = {0,0,0}})
+          Slab.Text(maze:get_maze()[i][j], {Color = {0,0,0}})
           Slab.SameLine()
           Slab.SetCursorPos(x, y)
       end
@@ -254,8 +257,9 @@ function game_draw()
     x,y = Slab.GetCursorPos()
     Slab.SetCursorPos(0, y + 32)
   end
-  
-  draw_moves(history, current_move)
+  if history then
+    draw_moves(history, current_move)
+  end
 end
 
 -- menu bar creation
@@ -275,14 +279,19 @@ function create_menu()
     end
     if Slab.BeginMenu("Solve") then
       if Slab.MenuItem("Depth-First Search") then
+        run_algorithm(dfs)
       end
       if Slab.MenuItem("Breadth-First Search") then
+        run_algorithm(bfs)
       end  
       if Slab.MenuItem("Bidirectional Search") then
       end  
       if Slab.MenuItem("Best-First Search") then
       end
       if Slab.MenuItem("A* Search") then
+      end
+      if Slab.MenuItem("Dijkstra's Algorithm") then
+        run_algorithm(dijkstra)
       end
       Slab.EndMenu()
     end
@@ -307,8 +316,10 @@ end
 function love.update(dt)
   Slab.Update(dt)
   create_menu()
-  user_input()
 	Slab.BeginWindow('MainWindow', {Title = nil, AutoSizeWindow = false, W = love.graphics.getWidth( ) + 1, H = love.graphics.getHeight()-20, X = -2, Y = 17, NoSavedSettings = true, AllowMove = false})
+  if history then
+    user_input()
+  end
   if filepath ~= "" then
     game_update()
     game_draw()

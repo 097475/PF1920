@@ -1,64 +1,3 @@
-require "maze"
--- hash table
---visited = {
---  ["5|2|5"] = {"", 0 },
---  ["4|3|5"] = {"R", -1 },
---  ["3|3|4"] = {"U", -1 },
---}
-
--- maze -> table of tables with integers and chars inside
-
-
--- get all lines from a file
-function lines_from(file)
-  assert(io.open(file, "rb"))
-  lines = {}
-  for line in io.lines(file) do 
-    lines[#lines + 1] = line
-  end
-  return lines
-end
-
--- builds a maze from the table containing lines of the file
-function build_maze(lines_table)
-  local maze = Maze:new()
-  maze:initialize(lines_table)
-  return maze
-end
-
-
--- builds the start table: it contains vitality of the player, entry point and exit points
-function build_start_table(lines_table, maze)
-  start = {}
-  start.vitality = lines[1]
-  assert(maze:entry_point_validity(), "The maze file must contain only one entry point.")
-  local entry_point = maze:find_points("i")[1]
-  start.entry_point = {}
-  start.entry_point = entry_point
-  start.exit_points = maze:find_points("u")
-  return start
-end
-
--- builds maze table and start table and checks for input errors
-function init_game_data(filename)
-  local lines = lines_from(filename)
-  local maze = build_maze(lines)
-  assert(maze:is_valid(), "Maze format is not correct: rows have not the same number of columns.")
-  local start = build_start_table(lines, maze)
-  return start, maze
-end
-
--- input: two dimensional table
--- output: none
-function print_table(tab)
-  for i,v in ipairs(tab) do
-    for j, w in ipairs(v) do
-      io.write(w)
-    end
-    io.write("\n")
-  end
-end
-
 -- input: life, x, y as numbers
 -- output: string representing the state
 function encode(life, x, y)
@@ -99,11 +38,11 @@ function gen_path(final, tree)
   -- input: state string final, path string path
   -- output: table representing the steps taken in the path using DULR and life change at each step
   function _gen_path(final, history)
-    if tree[final][1] == "" then
+    if tree[final].move == "" then
       return history
     else
       table.insert(history, 1, tree[final])
-      return _gen_path(invert_move(final, tree[final][1], tree[final][2]), history)
+      return _gen_path(invert_move(final, tree[final].move, tree[final].life_change), history)
     end
   end
   -- input: state string, move used to get to state, life_chance applied after getting to state
@@ -116,33 +55,6 @@ function gen_path(final, tree)
   
   return _gen_path(final, {})
   end
-
--- TODO: REMOVE SIDE EFFECTS
--- input: table representing the steps taken in the path using DULR and life change at each step, two dimensional table representing maze, initial life
--- output: modified maze, final life
-function write_path(history, maze, life)
-  -- input: table representing the steps taken in the path using DULR and life change at each step, x coordinate, y coordinate of current position in maze, initial life
-  -- output: final life
-  function _write_path(history, x, y, life)
-    local move = table.remove(history, 1)
-    local action = move[1]
-    local life_change = move[2]
-    local delta_x, delta_y = move_vector(action)
-    x = x + delta_x
-    y = y + delta_y
-    life = life + life_change
-    maze[y][x] = "*"
-    if #history > 0 then
-      return _write_path(history, x, y, life)
-    else
-      return life
-    end
-  end
-  
-  local x,y = find_initial(maze)
-  maze[y][x] = "*"  
-  return maze, _write_path(history, x, y, life)
-end
 
  -- return move for x parameter "L" or "R"
 function get_move_x(x)
@@ -221,7 +133,7 @@ end
 
 -- return move available in a specific format with life,position and move, life change
 function move_encode(encode_state, maze)
-  life,x,y=decode(encode_state)
+  local life,x,y=decode(encode_state)
   local move={}
   local available={}
   available= move_available(maze,y,x)
@@ -229,22 +141,12 @@ function move_encode(encode_state, maze)
   for i=1,#available do
     delta_x, delta_y= move_vector(available[i])
    local new_life= life_update(life,maze,y+delta_y,x+delta_x)
-   move[ encode(new_life, x + delta_x, y + delta_y) ] = {available[i], new_life - life}
+   move[ encode(new_life, x + delta_x, y + delta_y) ] = {move=available[i], life_change = new_life - life}
   end
-  --for key,value in pairs(move) do 
-    
-  --   for j, w in ipairs(value) do
-  --     print(key,w)
-  --  end
-  --end
   return move
   end
 
 function initial_state(start)
  local encode= encode(start.vitality, start.entry_point.x,start.entry_point.y)
   return encode
-  end
--- start, maze = init_game_data("mazes/maze_1.txt")
--- print(start)
--- print(maze)
--- print(move_encode('3|2|5', maze))
+end

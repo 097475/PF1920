@@ -1,4 +1,6 @@
-require "input"
+require "input-output"
+require "maze"
+require "maze_functions"
 require "queue"
 require "tbl"
 require "stack"
@@ -13,13 +15,14 @@ end
 -- input: maze, entry point encoded, coordinates of exit point
 -- output: list of all states
 function bfs(maze, entry_point_encoded, exit_y, exit_x)
+    maze = maze:get_maze()
     local visited = {}
     local paths_queue = Queue:new()
     local directions_queue = Queue:new()
     local path
     local directions_path
     paths_queue:enqueue({entry_point_encoded})
-    directions_queue:enqueue({{"_",0}})
+    directions_queue:enqueue({{move="_", life_change=0}})
     entry_life, entry_x, entry_y = decode(entry_point_encoded)
     table.insert(visited, {entry_y, entry_x})
     while not paths_queue:isEmpty() do
@@ -49,13 +52,14 @@ end
 
 -- DFS 
 function dfs(maze, entry_point_encoded, exit_y,exit_x)
+    maze = maze:get_maze()
     local visited = {}
     local paths_stack = Stack:Create()
     local directions_stack = Stack:Create()
     local path
     local directions_path
     paths_stack:push({entry_point_encoded})
-    directions_stack:push({{"",0}})
+    directions_stack:push({{move="_", life_change=0}})
     entry_life, entry_x, entry_y = decode(entry_point_encoded)
     table.insert(visited, {entry_y, entry_x})
     while paths_stack:getn() ~= 0 do
@@ -179,15 +183,37 @@ function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
 end
 
 
+function create_solver(algorithm)
+  solve = function(maze_filepath) 
+            local start, maze = init_game_data(maze_filepath)
+            local history_tables = {}
+            for i,v in ipairs(start.exit_points) do
+              local path, history = algorithm(maze,initial_state(start),v.y,v.x)  --should only return the total hash table and final state
+              -- history = gen_path(final_state, visited)
+              table.insert(history_tables, history)
+            end
+            -- <-- here, select the best history in history_tables, for now we select the first-->
+            return history_tables[1] -- return the path
+          end
+  return solve
+end
+
 start, maze = init_game_data("mazes/maze_1.txt")
 --path, history = bfs(maze:get_maze(),initial_state(start),2,10)
 --path, history = dfs(maze:get_maze(),initial_state(start),4,6)
-path, history = dijkstra(maze,initial_state(start),4,6)
+path, _history = dijkstra(maze,initial_state(start),4,6)
 
 for _, d in pairs(path) do
   print(d)
 end
 
-for _, d in pairs(history) do
-    print(d[1], d[2])
-  end
+for _, d in pairs(_history) do
+  print(d.move, d.life_change)
+end
+
+print("---")
+
+best_history = create_solver(dfs)("mazes/maze_1.txt")
+for _, d in pairs(best_history) do
+  print(d.move, d.life_change)
+end
