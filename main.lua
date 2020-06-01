@@ -183,7 +183,6 @@ function game_load()
   current_move = 0
   index = 0
   start, maze = init_game_data(filepath)
-  --maze = maze:get_maze()
   life = start.vitality
   tilemap = generate_tilemap(maze):get_maze()
 end
@@ -194,7 +193,9 @@ function run_algorithm(selected_algorithm)
     index = 0
     life = start.vitality
     history = create_solver(selected_algorithm)(filepath)
-    table.remove(history, 1)
+    if selected_algorithm ~= astar then
+      table.remove(history, 1)
+    end
 end
 
 
@@ -292,6 +293,7 @@ function create_menu()
       if Slab.MenuItem("Best-First Search") and maze then
       end
       if Slab.MenuItem("A* Search") and maze then
+        run_algorithm(astar)
       end
       if Slab.MenuItem("Dijkstra's Algorithm") and maze then
         run_algorithm(dijkstra)

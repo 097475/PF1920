@@ -38,11 +38,11 @@ function gen_path(final, tree)
   -- input: state string final, path string path
   -- output: table representing the steps taken in the path using DULR and life change at each step
   function _gen_path(final, history)
-    if tree[final].move == "" then
+    if tree[string.match(final, "|(.*)")].move == "" then
       return history
     else
-      table.insert(history, 1, tree[final])
-      return _gen_path(invert_move(final, tree[final].move, tree[final].life_change), history)
+      table.insert(history, 1, tree[string.match(final, "|(.*)")])
+      return _gen_path(invert_move(final, tree[string.match(final, "|(.*)")].move, tree[string.match(final, "|(.*)")].life_change), history)
     end
   end
   -- input: state string, move used to get to state, life_chance applied after getting to state
