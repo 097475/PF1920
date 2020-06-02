@@ -16,7 +16,7 @@ function astar(maze, entry_point_encoded, exit_y, exit_x)
   maze = maze:get_maze()
   local open = {}
   local closed = {}
-  local queue = PriorityQueue.new(function(a, b) return (a.g + a.h <= b.g + b.h) end)
+  local queue = PriorityQueue.new(function(a, b) return ((a.g + a.h > b.g + b.h) or ((a.g + a.h == b.g + b.h) and a.life_change > b.life_change))  end)
   local init_life, init_x, init_y = decode(entry_point_encoded)
   local root_values = {g = 0, h = manhattan(init_x, init_y, exit_x, exit_y), move="", life_change=0 }
   open[string.match(entry_point_encoded, "|(.*)")] = root_values

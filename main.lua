@@ -236,6 +236,7 @@ end
 
 -- function that draws the actual window contents: the maze and the path
 function game_draw() 
+  if algorithm_label then Slab.Text("Solver : " .. algorithm_label.. "\t") Slab.SameLine() end
   Slab.Text("Life: " .. life)
   if history then
       Slab.SameLine()
@@ -283,9 +284,11 @@ function create_menu()
     end
     if Slab.BeginMenu("Solve") then
       if Slab.MenuItem("Depth-First Search")  and maze then
+        algorithm_label = "Depth-First Search"
         run_algorithm(dfs)
       end
       if Slab.MenuItem("Breadth-First Search") and maze then
+        algorithm_label = "Breadth-First Search"
         run_algorithm(bfs)
       end  
       if Slab.MenuItem("Bidirectional Search") and maze then
@@ -293,9 +296,11 @@ function create_menu()
       if Slab.MenuItem("Best-First Search") and maze then
       end
       if Slab.MenuItem("A* Search") and maze then
+        algorithm_label = "A* Search"
         run_algorithm(astar)
       end
       if Slab.MenuItem("Dijkstra's Algorithm") and maze then
+        algorithm_label = "Dijkstra's Algorithm"
         run_algorithm(dijkstra)
       end
       Slab.EndMenu()
