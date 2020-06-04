@@ -224,6 +224,7 @@ function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
 end
 
 
+-- check when history is null because no path exists
 function create_solver(algorithm)
   solve = function(maze_filepath) 
             local start, maze = init_game_data(maze_filepath)
@@ -244,11 +245,11 @@ function create_solver(algorithm)
   return solve
 end
 
---local start, maze = init_game_data("mazes/maze_1.txt")
+--local start, maze = init_game_data("mazes/longer_route.txt")
 --local path, history = bfs(maze:get_maze(),initial_state(start),2,10)
 --local path, history = dfs(maze:get_maze(),initial_state(start),4,6)
 --local path, _history = dijkstra(maze,initial_state(start),4,6)
---astar(maze:get_maze(), initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
+--astar(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 --for _, d in pairs(path) do
 --  print(d)
 --end
@@ -259,7 +260,7 @@ end
 
 --print("---")
 
---local best_history = create_solver(astar)("mazes/maze_1.txt")
+--local best_history = create_solver(astar)("mazes/longer_route.txt")
 --for k, d in pairs(best_history) do
 --  print(k, d.move, d.life_change)
 --end

@@ -11,6 +11,8 @@ function Maze:new()
     return setmetatable(object, self)
 end
 
+--input: function to apply to Maze functor e.g. function(x) return x + 1 end
+--output: new Maze functor with function f applied to its elements
 function Maze:__call(f)
   local maze = Maze:new()
   for i, row in ipairs(self.rows) do

@@ -1,21 +1,24 @@
--- input: life, x, y as numbers
--- output: string representing the state
+-- input: life, x, y as numbers e.g. 5, 1, 2
+-- output: string representing the state e.g. "5|1|2"
+-- [PURE]
 function encode(life, x, y)
   return life .. "|" .. x .. "|" .. y 
 end
 
--- input: string representing the state
--- output: life, x, y as numbers
+-- input: string representing the state e.g. "5|1|2"
+-- output: life, x, y as numbers e.g. 5, 1, 2
+-- [PURE]
 function decode(str)
   local values = {}
-  for i in string.gmatch(str, "%d+") do
+  for i in string.gmatch(str, "%-?%d+") do
     table.insert(values, tonumber(i))
   end
   return table.unpack(values)
 end
 
--- input: character D, U, L or R
--- output: delta_x, delta_y representing the change in x and y
+-- input: character D, U, L or R, e.g. "L"
+-- output: delta_x, delta_y representing the change in x and y, e.g. -1, 0
+-- [PURE]
 function move_vector(move)
   local delta_x, delta_y
     if move == "D" then
