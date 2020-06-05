@@ -5,6 +5,7 @@ require "queue"
 require "tbl"
 require "stack"
 require "priority_queue"
+require "hashtable"
 
 -- input: x and y coordinates of two points
 -- output: manhattan distance
@@ -196,12 +197,11 @@ function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
         priority_queue = PriorityQueue:CreateFromTables(cells, distances)
         table.insert(visited, {encode(cell.life, cell.x, cell.y), cell.direction_life_difference, cell.previous})
         if cell.x == exit_x and cell.y == exit_y then
-            reversed_path = {}
-            reversed_history = {}
+            local reversed_history = create_hashtable()
             local current_cell = visited[#visited]
             local previous = current_cell[3]
             while previous ~= nil do
-                reversed_history[string.match(current_cell[1], "|(.*)")] = current_cell[2]
+                reversed_history[current_cell[1]] = current_cell[2]
                 for _,k in pairs(visited) do
                     if previous == k[1] then
                         current_cell = k
@@ -209,7 +209,7 @@ function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
                     end
                 end
             end
-            reversed_history[string.match(visited[1][1], "|(.*)")] = visited[1][2]
+            reversed_history[visited[1][1]] = visited[1][2]
             return encode(cell.life, cell.x, cell.y), reversed_history
         end
     end
