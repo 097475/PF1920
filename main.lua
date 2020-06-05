@@ -1,10 +1,10 @@
---TODO: usare funtore
 -- used to allow printing while the GUI is running
 io.stdout:setvbuf("no")
 -- used to enable lua 5.3 syntax for unpacking tables
 table.unpack = unpack
 -- import of input module
 require "input-output"
+-- import of algorithms module
 require "algorithms"
 -- import of Slab library
 local Slab = require 'Slab'
@@ -47,7 +47,7 @@ arrow_rows = 2
 arrow_cols = 7
 
 
--- draws a line at x,y with the specified orientation
+-- draws a line at x,y with the specified orientation, using the arrow_tileset [PURE]
 function draw_line(x, y, orientation)
   Slab.SetCursorPos(x, y + 8)  
   if orientation == "SOUTH" then
@@ -65,7 +65,7 @@ function draw_line(x, y, orientation)
   end 
 end
 
--- draws the path origin with the specified orientation
+-- draws the path origin with the specified orientation, using the arrow_tileset [PURE]
 function draw_origin(x, y, orientation)
   Slab.SetCursorPos(x, y + 8)  
   if orientation == "SOUTH" then
@@ -77,11 +77,10 @@ function draw_origin(x, y, orientation)
   elseif orientation == "WEST" then
     Slab.Image('Path', { Image = arrow , SubX = arrow_quads[ORIGIN_WEST].x, SubY = arrow_quads[ORIGIN_WEST].y, SubW = arrow_quads[ORIGIN_WEST].w, SubH = arrow_quads[ORIGIN_WEST].h})
   end  
-
 end
 
 
--- draws the last step in the drawn path (the arrow) with the specified orientation
+-- draws the last step in the drawn path (the arrow) with the specified orientation, from the arrow_tileset [PURE]
 function draw_destination(x, y, orientation)
   Slab.SetCursorPos(x, y + 8)  
   if orientation == "SOUTH" then
@@ -151,8 +150,9 @@ function draw_moves(history, current_move)
 end
 
 
--- Converts a maze to a matrix of tile numbers
+-- Converts a maze to a matrix of tile numbers, using the maze as functor [PURE]
 function generate_tilemap(maze)
+  -- Function that maps each element of the maze to the corresponding tile number [PURE]
   function mapper (element)
     if element == "p" then
       return PIT
@@ -193,7 +193,7 @@ function run_algorithm(selected_algorithm)
     index = 0
     life = start.vitality
     history = create_solver(selected_algorithm)(filepath)
-    if selected_algorithm ~= astar then
+    if selected_algorithm ~= astar and selected_algorithm ~= dijkstra then
       table.remove(history, 1)
     end
 end
@@ -340,11 +340,13 @@ end
 
 -- love specific function: called in loop after love.update
 -- the function calls Slab to draw the windows set up in love.update
+-- [PURE]
 function love.draw()
   Slab.Draw()  
 end
 
 -- function to parse user key presses
+-- takes input from outside
 function user_input()
      if Slab.IsKeyPressed("space") and current_move < #history then
         current_move = current_move + 1
