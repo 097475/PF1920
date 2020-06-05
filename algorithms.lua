@@ -23,7 +23,7 @@ function astar(maze, entry_point_encoded, exit_y, exit_x)
   queue:Add(entry_point_encoded, root_values)
   while queue:Size() > 0 do
     local current = queue:Pop()
-    print(current)
+    --print(current)
     if open[string.match(current, "|(.*)")] then
       local current_values = open[string.match(current, "|(.*)")]
       local current_life, current_x, current_y = decode(current)
@@ -90,7 +90,8 @@ function bfs(maze, entry_point_encoded, exit_y, exit_x)
     return false
 end
 
-
+-- input: maze, entry point encoded, coordinates of exit point
+-- output: list of all states
 -- DFS 
 function dfs(maze, entry_point_encoded, exit_y,exit_x)
     maze = maze:get_maze()
@@ -110,6 +111,8 @@ function dfs(maze, entry_point_encoded, exit_y,exit_x)
         local life, x, y = decode(last_cell)
         
         if x == exit_x and y == exit_y then
+        
+          --return last_cell,gen_path(last_cell, visited) end
           return path, directions_path end
         local available_moves = move_encode(last_cell, maze)
         
@@ -244,19 +247,23 @@ function create_solver(algorithm)
   return solve
 end
 
---local start, maze = init_game_data("mazes/maze_1.txt")
+local start, maze = init_game_data("mazes/maze_1.txt")
+--local a=create_solver(dfs)("mazes/maze_1.txt")
 --local path, history = bfs(maze:get_maze(),initial_state(start),2,10)
---local path, history = dfs(maze:get_maze(),initial_state(start),4,6)
+local path, history = dfs(maze,initial_state(start),4,6)
 --local path, _history = dijkstra(maze,initial_state(start),4,6)
---astar(maze:get_maze(), initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
---for _, d in pairs(path) do
---  print(d)
---end
+--local path, history=astar(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 
---for _, d in pairs(_history) do
---  print(d.move, d.life_change)
---end
+for x, d in pairs(path) do
+  print( d)
+  
+end
+for x, d in pairs(history) do
+  print( d.move, d.life_change)
+  
+end
 
+--print(gen_path("8|4|6", history))
 --print("---")
 
 --local best_history = create_solver(astar)("mazes/maze_1.txt")
