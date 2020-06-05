@@ -193,7 +193,7 @@ function run_algorithm(selected_algorithm)
     index = 0
     life = start.vitality
     history = create_solver(selected_algorithm)(filepath)
-    if selected_algorithm ~= astar then
+    if selected_algorithm ~= astar and selected_algorithm ~= dijkstra then
       table.remove(history, 1)
     end
 end

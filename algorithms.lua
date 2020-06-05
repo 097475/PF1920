@@ -63,7 +63,7 @@ function bfs(maze, entry_point_encoded, exit_y, exit_x)
     local path
     local directions_path
     paths_queue:enqueue({entry_point_encoded})
-    directions_queue:enqueue({{move="_", life_change=0}})
+    directions_queue:enqueue({{move="", life_change=0}})
     entry_life, entry_x, entry_y = decode(entry_point_encoded)
     table.insert(visited, {entry_y, entry_x})
     while not paths_queue:isEmpty() do
@@ -100,7 +100,7 @@ function dfs(maze, entry_point_encoded, exit_y,exit_x)
     local path
     local directions_path
     paths_stack:push({entry_point_encoded})
-    directions_stack:push({{move="_", life_change=0}})
+    directions_stack:push({{move="", life_change=0}})
     entry_life, entry_x, entry_y = decode(entry_point_encoded)
     table.insert(visited, {entry_y, entry_x})
     while paths_stack:getn() ~= 0 do
@@ -146,7 +146,7 @@ function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
         if entry_x == walkable_cells[i].x and entry_y == walkable_cells[i].y then
             distances[i] = 0
             cells[i].life = entry_life
-            cells[i].direction_life_difference = {"",0}
+            cells[i].direction_life_difference = {move = "", life_change = 0}
         else 
             distances[i] = 10000
             cells[i].life = nil
@@ -201,8 +201,7 @@ function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
             local current_cell = visited[#visited]
             local previous = current_cell[3]
             while previous ~= nil do
-                table.insert(reversed_path, current_cell[1])
-                table.insert(reversed_history, current_cell[2])
+                reversed_history[string.match(current_cell[1], "|(.*)")] = current_cell[2]
                 for _,k in pairs(visited) do
                     if previous == k[1] then
                         current_cell = k
@@ -210,15 +209,8 @@ function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
                     end
                 end
             end
-            table.insert(reversed_path, visited[1][1])
-            table.insert(reversed_history, visited[1][2])
-            local sorted_path = {}
-            local sorted_history = {}
-            for i = #reversed_path,1,-1 do
-                table.insert(sorted_path, reversed_path[i])
-                table.insert(sorted_history, reversed_history[i])
-            end
-            return sorted_path, sorted_history
+            reversed_history[string.match(visited[1][1], "|(.*)")] = visited[1][2]
+            return encode(cell.life, cell.x, cell.y), reversed_history
         end
     end
 end
@@ -231,8 +223,11 @@ function create_solver(algorithm)
             local history_tables = {}
             for i,v in ipairs(start.exit_points) do
               local final_state, visited = algorithm(maze,initial_state(start),v.y,v.x)  --should only return the total hash table and final state
-              if(algorithm == astar) then
+              if(algorithm == astar or algorithm == dijkstra) then
                 history = gen_path(final_state, visited)
+                for k,v in pairs(history) do
+                  print(k, v.move, v.life_change)
+                end
               else
                 history = visited
               end
@@ -246,8 +241,8 @@ function create_solver(algorithm)
 end
 
 --local start, maze = init_game_data("mazes/longer_route.txt")
---local path, history = bfs(maze:get_maze(),initial_state(start),2,10)
---local path, history = dfs(maze:get_maze(),initial_state(start),4,6)
+--local path, history = bfs(maze,initial_state(start),2,10)
+--local path, history = dfs(maze,initial_state(start),4,6)
 --local path, _history = dijkstra(maze,initial_state(start),4,6)
 --astar(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 --for _, d in pairs(path) do
@@ -264,3 +259,5 @@ end
 --for k, d in pairs(best_history) do
 --  print(k, d.move, d.life_change)
 --end
+
+--create_solver(dijkstra)("mazes/maze_1.txt")
