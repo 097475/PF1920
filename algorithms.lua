@@ -260,7 +260,7 @@ end
 
 --print("---")
 
---local best_history = create_solver(astar)("mazes/longer_route.txt")
+local best_history = create_solver(astar)("mazes/maze_1.txt")
 --for k, d in pairs(best_history) do
 --  print(k, d.move, d.life_change)
 --end
