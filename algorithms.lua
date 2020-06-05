@@ -112,15 +112,18 @@ function dfs(maze, entry_point_encoded, exit_y,exit_x)
         local life, x, y = decode(last_cell)
         
         if x == exit_x and y == exit_y then
-        
-          --return last_cell,gen_path(last_cell, visited) end
-          return path, directions_path end
+          local history=create_hashtable()
+          for i=1,#directions_path do
+            local cell=path[i]
+            local direction= directions_path[i]
+            history[cell] = direction
+            end
+          return last_cell, history end
         local available_moves = move_encode(last_cell, maze)
         
         for move, direction_life_difference in pairs(available_moves) do
             local move_life, move_x, move_y = decode(move)
             if  table.contains(visited, {move_y, move_x}) == false and move_life > 0 then
-    
                 table.insert(visited, {move_y, move_x})
                 local new_path = table.copy(path)
                 local new_direction = table.copy(directions_path)
@@ -226,11 +229,11 @@ function create_solver(algorithm)
             local history_tables = {}
             for i,v in ipairs(start.exit_points) do
               local final_state, visited = algorithm(maze,initial_state(start),v.y,v.x)  --should only return the total hash table and final state
-              if(algorithm == astar or algorithm == dijkstra) then
+              if(algorithm == astar or algorithm == dijkstra or algorithm == dfs) then
                 history = gen_path(final_state, visited)
-                for k,v in pairs(history) do
-                  print(k, v.move, v.life_change)
-                end
+                --for k,v in pairs(history) do
+                  --print(k, v.move, v.life_change)
+                --end
               else
                 history = visited
               end
@@ -243,7 +246,7 @@ function create_solver(algorithm)
   return solve
 end
 
---local start, maze = init_game_data("mazes/longer_route.txt")
+local start, maze = init_game_data("mazes/maze_1.txt")
 --local path, history = bfs(maze,initial_state(start),2,10)
 --local path, history = dfs(maze,initial_state(start),4,6)
 --local path, _history = dijkstra(maze,initial_state(start),4,6)
@@ -252,21 +255,22 @@ end
 --  print(d)
 --end
 
-for x, d in pairs(path) do
-  print( d)
+--for _, d in pairs(path) do
+  --print( d)
   
-end
-for x, d in pairs(history) do
-  print( d.move, d.life_change)
+--end
+--for x, d in pairs(history) do
+  --print( d.move, d.life_change)
   
-end
+--end
 
 --print(gen_path("8|4|6", history))
 --print("---")
 
 local best_history = create_solver(astar)("mazes/maze_1.txt")
---for k, d in pairs(best_history) do
---  print(k, d.move, d.life_change)
---end
+for k, d in pairs(best_history) do
+  print(k, d.move, d.life_change)
+  
+end
 
 --create_solver(dijkstra)("mazes/maze_1.txt")
