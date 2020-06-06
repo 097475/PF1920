@@ -7,24 +7,6 @@ require "stack"
 require "priority_queue"
 require "hashtable"
 
-function find_all_paths(maze, entry_point_encoded, exit_y, exit_x)
-  
-  function depth_first_search(node, visited, paths, current_path)
-
-    
-    if #visited[node].parents == 0 then
-      paths[#paths+1] = table.reverse(current_path)
-    end
-    
-    for i, parent in ipairs(visited[node].parents) do
-      current_path[#current_path+1] = {move = parent.move, life_change = parent.life_change}
-      depth_first_search(parent.state, visited, paths, current_path)
-    end
-    
-    current_path[#current_path] = nil
-    
-  end
-  
   function calculate_path_value(path, start_life)
     for i, values in ipairs(path) do
       start_life = start_life + values.life_change
@@ -44,6 +26,62 @@ function find_all_paths(maze, entry_point_encoded, exit_y, exit_x)
       end
     end
     return shortest_paths[best_index]
+  end
+  
+  
+
+function bruteforce(maze, entry_point_encoded, exit_y, exit_x)
+  
+  local paths = {}
+  
+  function expand_node(node, path, current_path)
+    local life, current_x, current_y = decode(node)
+    
+    if current_x == exit_x and current_y == exit_y then
+      paths[#paths+1] = table.copy(current_path)
+      path[node] = nil
+      current_path[#current_path] = nil
+    else
+      local available_moves = move_encode(node, maze)
+      for next_state, values in pairs(available_moves) do    
+        if path[next_state] == nil then
+          path[next_state] = true
+          current_path[#current_path + 1] = values
+          expand_node(next_state, path, current_path)
+        end
+      end
+    path[node] = nil
+    current_path[#current_path] = nil
+    end
+  end
+  
+  
+  maze = maze:get_maze()
+  local path = create_hashtable()
+  path[entry_point_encoded] = true
+  expand_node(entry_point_encoded, path, {})
+  
+  local life, _, _ = decode(entry_point_encoded)
+  return nodeTo, find_best_path(paths, life)
+end
+
+
+function find_all_paths(maze, entry_point_encoded, exit_y, exit_x)
+  
+  function depth_first_search(node, visited, paths, current_path)
+
+    
+    if #visited[node].parents == 0 then
+      paths[#paths+1] = table.reverse(current_path)
+    end
+    
+    for i, parent in ipairs(visited[node].parents) do
+      current_path[#current_path+1] = {move = parent.move, life_change = parent.life_change}
+      depth_first_search(parent.state, visited, paths, current_path)
+    end
+    
+    current_path[#current_path] = nil
+    
   end
   
     maze = maze:get_maze()
@@ -396,6 +434,6 @@ end
   
 --end
 
-create_solver(find_all_paths)("mazes/maze_1.txt")
-
+--create_solver(bruteforce)("mazes/maze_1.txt")
+--bruteforce(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 --find_all_paths(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )

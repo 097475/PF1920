@@ -193,7 +193,7 @@ function run_algorithm(selected_algorithm)
     index = 0
     life = start.vitality
     history = create_solver(selected_algorithm)(filepath)
-    if selected_algorithm ~= astar and selected_algorithm ~= dijkstra and selected_algorithm ~= dfs and selected_algorithm ~= find_all_paths and selected_algorithm ~= rec_dfs then
+    if selected_algorithm ~= astar and selected_algorithm ~= dijkstra and selected_algorithm ~= dfs and selected_algorithm ~= find_all_paths and selected_algorithm ~= rec_dfs and selected_algorithm ~= bruteforce then
       table.remove(history, 1)
     end
 end
@@ -296,7 +296,9 @@ function create_menu()
         algorithm_label = "Find-All-Paths"
         run_algorithm(find_all_paths)
       end  
-      if Slab.MenuItem("Best-First Search") and maze then
+      if Slab.MenuItem("Bruteforce") and maze then
+        algorithm_label = "Bruteforce"
+        run_algorithm(bruteforce)
       end
       if Slab.MenuItem("A* Search") and maze then
         algorithm_label = "A* Search"
