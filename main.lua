@@ -193,7 +193,10 @@ function run_algorithm(selected_algorithm)
     index = 0
     life = start.vitality
     history = create_solver(selected_algorithm)(filepath)
-    if selected_algorithm ~= astar and selected_algorithm ~= dijkstra and selected_algorithm ~= dfs then
+    for k,v in pairs(history) do
+      print(k, v.move, v.life_change)
+    end
+    if selected_algorithm ~= astar and selected_algorithm ~= dijkstra and selected_algorithm ~= dfs and selected_algorithm ~= rec_dfs then
       table.remove(history, 1)
     end
 end
@@ -285,7 +288,8 @@ function create_menu()
     if Slab.BeginMenu("Solve") then
       if Slab.MenuItem("Depth-First Search")  and maze then
         algorithm_label = "Depth-First Search"
-        run_algorithm(dfs)
+        --run_algorithm(dfs)
+        run_algorithm(rec_dfs)
       end
       if Slab.MenuItem("Breadth-First Search") and maze then
         algorithm_label = "Breadth-First Search"
