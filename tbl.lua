@@ -19,6 +19,14 @@ function table.copy(tbl)
     return t
 end
 
+function table.reverse(tbl)
+  local t = {}
+  for i = #tbl, 1, -1 do
+      table.insert(t, tbl[i])
+  end
+  return t
+end
+
 --[[
 This function takes 2 values as input and returns true if they are equal
 and false if not. a and b can numbers, strings, booleans, tables and nil.

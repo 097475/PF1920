@@ -7,6 +7,101 @@ require "stack"
 require "priority_queue"
 require "hashtable"
 
+function find_all_paths(maze, entry_point_encoded, exit_y, exit_x)
+  
+  function depth_first_search(node, visited, paths, current_path)
+
+    
+    if #visited[node].parents == 0 then
+      paths[#paths+1] = table.reverse(current_path)
+    end
+    
+    for i, parent in ipairs(visited[node].parents) do
+      current_path[#current_path+1] = {move = parent.move, life_change = parent.life_change}
+      depth_first_search(parent.state, visited, paths, current_path)
+    end
+    
+    current_path[#current_path] = nil
+    
+  end
+  
+  function calculate_path_value(path, start_life)
+    for i, values in ipairs(path) do
+      start_life = start_life + values.life_change
+    end
+    return start_life
+  end
+  
+  
+  function find_best_path(shortest_paths, life)
+    local best_index = 1
+    local best_value = calculate_path_value(shortest_paths[best_index], life)
+    for i, path in ipairs(shortest_paths) do
+      local value =  calculate_path_value(shortest_paths[i], life)
+      if value < best_value and value > 0 then
+        best_index = i
+        best_value = value
+      end
+    end
+    return shortest_paths[best_index]
+  end
+  
+    maze = maze:get_maze()
+    local queue = Queue:new()
+    local open = create_hashtable()
+    local visited = create_hashtable()
+    queue:enqueue(entry_point_encoded)
+    open[entry_point_encoded] = {level=0, parents = {}}
+    
+    local nodeTo = nil
+    while not queue:isEmpty() do
+      local current = queue:dequeue()
+      local current_life, current_x, current_y = decode(current)
+      local current_level = open[current].level
+      
+      if current_x == exit_x and current_y == exit_y then
+        nodeTo = current
+        visited[current] = open[current]
+        break
+      end
+      
+      local available_moves = move_encode(current, maze)
+      for next_state, values in pairs(available_moves) do
+        if visited[next_state] == nil then
+          if open[next_state] == nil then
+            local next_node = {level=-1, parents = {}}
+            queue:enqueue(next_state)
+            open[next_state] = next_node
+          end
+            local next_node = open[next_state]
+            if current_level ~= next_node.level then
+              next_node.parents[#next_node.parents + 1] = {state=current, move = values.move, life_change = values.life_change} 
+              next_node.level = current_level + 1
+            end
+        end
+      end
+      
+      visited[current] = open[current]
+      open[current] = nil
+      
+    end
+    
+    if nodeTo == nil then
+      return {}
+    end
+    
+    local paths = {}
+    depth_first_search(nodeTo, visited, paths, {})
+    
+    local life, _, _ = decode(entry_point_encoded)
+    return nodeTo, find_best_path(paths, life)
+end
+
+
+
+
+
+
 -- input: x and y coordinates of two points
 -- output: manhattan distance
 function manhattan(x1, y1, x2, y2)
@@ -246,7 +341,7 @@ function create_solver(algorithm)
   return solve
 end
 
-local start, maze = init_game_data("mazes/maze_1.txt")
+--local start, maze = init_game_data("mazes/multiple_paths.txt")
 --local path, history = bfs(maze,initial_state(start),2,10)
 --local path, history = dfs(maze,initial_state(start),4,6)
 --local path, _history = dijkstra(maze,initial_state(start),4,6)
@@ -267,10 +362,12 @@ local start, maze = init_game_data("mazes/maze_1.txt")
 --print(gen_path("8|4|6", history))
 --print("---")
 
-local best_history = create_solver(astar)("mazes/maze_1.txt")
-for k, d in pairs(best_history) do
-  print(k, d.move, d.life_change)
+--local best_history = create_solver(astar)("mazes/maze_1.txt")
+--for k, d in pairs(best_history) do
+--  print(k, d.move, d.life_change)
   
-end
+--end
 
---create_solver(dijkstra)("mazes/maze_1.txt")
+create_solver(find_all_paths)("mazes/multiple_paths.txt")
+
+--find_all_paths(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
