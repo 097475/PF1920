@@ -232,6 +232,37 @@ function dfs(maze, entry_point_encoded, exit_y,exit_x)
     return false
 end
 
+--recursive dfs
+function rec_dfs(maze_metatable, entry_point_encoded, exit_y, exit_x)
+  local function _rec_dfs(current_cell_encoded, current_path, maze_grid)
+    local life, x, y = decode(current_cell_encoded)
+    if x == exit_x and y == exit_y then
+      return current_cell_encoded, current_path end
+    
+    local available_moves = move_encode(current_cell_encoded, maze_grid)
+    for move, direction_life_difference in pairs(available_moves) do
+      move_life, move_x, move_y = decode(move)
+      if (not table.contains(visited, string.match(move, "|(.*)"))) and move_life > 0 and current_path[move] == nil then
+          local new_path = copy_hashtable(current_path)
+          new_path[move] = direction_life_difference
+          local final, history = _rec_dfs(move, new_path, maze_grid)
+          if final ~= nil and history ~= nil then return final, history end
+      end 
+    end
+    table.insert(visited, string.match(current_cell_encoded, "|(.*)"))
+  end
+
+  visited = {}
+  local maze = maze_metatable:get_maze()
+  exit_x = exit_x
+  exit_y = exit_y
+
+  --table.insert(visited, string.match(entry_point_encoded, "|(.*)"))
+  local path = create_hashtable()
+  path[entry_point_encoded] = {move = "", life_change = 0}
+  return _rec_dfs(entry_point_encoded, path, maze)
+end
+
 
 --DIJKSTRA
 function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
@@ -324,7 +355,7 @@ function create_solver(algorithm)
             local history_tables = {}
             for i,v in ipairs(start.exit_points) do
               local final_state, visited = algorithm(maze,initial_state(start),v.y,v.x)  --should only return the total hash table and final state
-              if(algorithm == astar or algorithm == dijkstra or algorithm == dfs) then
+              if(algorithm == astar or algorithm == dijkstra or algorithm == dfs or algorithm == rec_dfs) then
                 history = gen_path(final_state, visited)
                 --for k,v in pairs(history) do
                   --print(k, v.move, v.life_change)
@@ -350,13 +381,10 @@ end
 --  print(d)
 --end
 
---for _, d in pairs(path) do
-  --print( d)
-  
---end
---for x, d in pairs(history) do
-  --print( d.move, d.life_change)
-  
+--local final, history = rec_dfs(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x)
+--print(final)
+--for k,d in pairs(history) do
+--  print(k, d.move, d.life_change)
 --end
 
 --print(gen_path("8|4|6", history))
