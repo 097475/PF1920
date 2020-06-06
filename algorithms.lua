@@ -34,8 +34,8 @@ function find_all_paths(maze, entry_point_encoded, exit_y, exit_x)
   
   
   function find_best_path(shortest_paths, life)
-    local best_index = 1
-    local best_value = calculate_path_value(shortest_paths[best_index], life)
+    local best_index = 0
+    local best_value = math.huge
     for i, path in ipairs(shortest_paths) do
       local value =  calculate_path_value(shortest_paths[i], life)
       if value < best_value and value > 0 then
@@ -396,6 +396,6 @@ end
   
 --end
 
-create_solver(find_all_paths)("mazes/multiple_paths.txt")
+create_solver(find_all_paths)("mazes/maze_1.txt")
 
 --find_all_paths(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
