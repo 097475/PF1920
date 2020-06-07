@@ -89,7 +89,7 @@ function draw_destination(x, y, orientation)
   Slab.Image('Path', { Image = arrow , SubX = arrow_quads[ARROW_NORTH].x, SubY = arrow_quads[ARROW_NORTH].y, SubW = arrow_quads[ARROW_NORTH].w, SubH = arrow_quads[ARROW_NORTH].h})
   elseif orientation == "EAST" then
   Slab.Image('Path', { Image = arrow , SubX = arrow_quads[ARROW_EAST].x, SubY = arrow_quads[ARROW_EAST].y, SubW = arrow_quads[ARROW_EAST].w, SubH = arrow_quads[ARROW_EAST].h})
-  elseif orientation == "NORTH" then
+  elseif orientation == "WEST" then
   Slab.Image('Path', { Image = arrow , SubX = arrow_quads[ARROW_WEST].x, SubY = arrow_quads[ARROW_WEST].y, SubW = arrow_quads[ARROW_WEST].w, SubH = arrow_quads[ARROW_WEST].h})
   end
 end
@@ -193,9 +193,10 @@ function run_algorithm(selected_algorithm)
     index = 0
     life = start.vitality
     history = create_solver(selected_algorithm)(filepath)
-    if selected_algorithm ~= astar and selected_algorithm ~= dijkstra and selected_algorithm ~= dfs and selected_algorithm ~= find_all_paths and selected_algorithm ~= rec_dfs and selected_algorithm ~= bruteforce then
+    if selected_algorithm == bfs then
       table.remove(history, 1)
     end
+    if not history then openNoSolutionDialog = true end
 end
 
 
@@ -220,8 +221,9 @@ function love.load(args)
     end
   end
   love.window.setTitle("Maze solver")
-  love.window.setMode(1000, 500, {resizable=true})
+  love.window.setMode(1000, 500, {resizable=true, vsync = 0})
   love.graphics.setBackgroundColor(0.4, 0.88, 1.0)
+  
   Slab.Initialize(args)
 end
 
@@ -321,6 +323,13 @@ function create_menu()
 				filepath = Result.Files[1]
         game_load()
 			end
+    end
+  end
+  
+  if openNoSolutionDialog then
+    local Result = Slab.MessageBox("Warning", "The maze has no solution!")
+    if Result == "OK" then
+      openNoSolutionDialog = false
     end
   end
 end

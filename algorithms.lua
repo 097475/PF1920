@@ -62,7 +62,7 @@ function bruteforce(maze, entry_point_encoded, exit_y, exit_x)
   expand_node(entry_point_encoded, path, {})
   
   local life, _, _ = decode(entry_point_encoded)
-  return nodeTo, find_best_path(paths, life)
+  return nil, find_best_path(paths, life)
 end
 
 
@@ -125,7 +125,7 @@ function find_all_paths(maze, entry_point_encoded, exit_y, exit_x)
     end
     
     if nodeTo == nil then
-      return {}
+      return nil, nil
     end
     
     local paths = {}
@@ -267,7 +267,7 @@ function dfs(maze, entry_point_encoded, exit_y,exit_x)
             end
         end
     end
-    return false
+    return nil
 end
 
 --recursive dfs
@@ -395,9 +395,6 @@ function create_solver(algorithm)
               local final_state, visited = algorithm(maze,initial_state(start),v.y,v.x)  --should only return the total hash table and final state
               if(algorithm == astar or algorithm == dijkstra or algorithm == dfs or algorithm == rec_dfs) then
                 history = gen_path(final_state, visited)
-                --for k,v in pairs(history) do
-                  --print(k, v.move, v.life_change)
-                --end
               else
                 history = visited
               end
@@ -405,7 +402,7 @@ function create_solver(algorithm)
               table.insert(history_tables, history)
             end
             -- <-- here, select the best history in history_tables, for now we select the first-->
-            return history_tables[1] -- return the path
+            return find_best_path(history_tables, start.vitality) -- return the path
           end
   return solve
 end
@@ -434,6 +431,6 @@ end
   
 --end
 
---create_solver(bruteforce)("mazes/maze_1.txt")
+local t = create_solver(astar)("mazes/multiple_exits.txt")
 --bruteforce(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 --find_all_paths(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )

@@ -56,7 +56,7 @@ function gen_path(final, tree)
     return encode(life - life_change, x - delta_x, y - delta_y)
   end
   
-  return _gen_path(final, {})
+  if not final then return nil else return _gen_path(final, {}) end
   end
 
  -- return move for x parameter "L" or "R"
