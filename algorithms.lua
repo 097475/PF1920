@@ -410,20 +410,23 @@ function create_solver(algorithm)
   return solve
 end
 
---local start, maze = init_game_data("mazes/multiple_paths.txt")
+local start, maze = init_game_data("mazes/maze_1.txt")
 --local path, history = bfs(maze,initial_state(start),2,10)
 --local path, history = dfs(maze,initial_state(start),4,6)
+
+local best_history = create_solver(astar)("mazes/maze_1.txt")
+
+--local move = table.remove(history)
+
+
 --local path, _history = dijkstra(maze,initial_state(start),4,6)
 --astar(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
---for _, d in pairs(path) do
---  print(d)
---end
 
+local maze,life= write_path(best_history, maze, 5)
+write_maze(maze,life)
 --local final, history = rec_dfs(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x)
 --print(final)
---for k,d in pairs(history) do
---  print(k, d.move, d.life_change)
---end
+
 
 --print(gen_path("8|4|6", history))
 --print("---")

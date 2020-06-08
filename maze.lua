@@ -24,6 +24,7 @@ function Maze:__call(f)
   return maze
 end
 
+--input
 function Maze:initialize(lines_table)
     for i=1,#lines-1 do
         row = {}
@@ -36,6 +37,7 @@ function Maze:initialize(lines_table)
     end
 end
 
+--output number of maze rows
 function Maze:maze_dimension()
     return #rows
 end
