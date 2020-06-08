@@ -98,7 +98,7 @@ function move_available(maze,y,x)
        if maze[y][x+z] ~= "m" and maze[y][x+z]~=nil and maze[y][x+z]~="p" then
         available[#available+1]=get_move_x(z)
       end
-      if maze[y+z][x] ~= "m" and maze[y+z][x]~=nil and maze[y][x+z]~="p" then
+      if maze[y+z][x] ~= "m" and maze[y+z][x]~=nil and maze[y+z][x]~="p" then
         
         available[#available +1 ]=get_move_y(z)
        

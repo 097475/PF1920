@@ -434,6 +434,6 @@ write_maze(maze,life)
   
 --end
 
-local t = create_solver(astar)("mazes/multiple_exits.txt")
+--local t = create_solver(astar)("mazes/multiple_exits.txt")
 --bruteforce(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 --find_all_paths(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
