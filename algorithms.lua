@@ -320,7 +320,8 @@ function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
     while priority_queue:Size() > 0 do
 
         local cell, distance = priority_queue:Pop()
-        assert(cell.life ~= nil, "There was an error in picking a cell from the priority queue.")
+        --if a cell life is nil, that means that maze has no solution
+        if cell.life == nil then return nil, nil end
         
         --retrieve index from cells table
         local cell_index = nil
