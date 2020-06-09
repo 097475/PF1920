@@ -125,6 +125,9 @@ function life_update(life,maze,y,x)
   else
     if cell == 'f'  then
       new_life=life/2
+       if new_life<1 then
+      new_life=0
+      end
       if new_life==1 then
        new_life=0
       end
