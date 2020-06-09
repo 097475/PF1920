@@ -183,82 +183,35 @@ function bfs(maze, entry_point_encoded, exit_y, exit_x)
     maze = maze:get_maze()
     local visited = {}
     local paths_queue = Queue:new()
-    local directions_queue = Queue:new()
+    local last_cells = Queue:new()
     local path
-    local directions_path
-    paths_queue:enqueue({entry_point_encoded})
-    directions_queue:enqueue({{move="", life_change=0}})
+    local first = create_hashtable()
+    first[entry_point_encoded] = {move="", life_change=0}
+    paths_queue:enqueue(first)
+    last_cells:enqueue(entry_point_encoded)
     entry_life, entry_x, entry_y = decode(entry_point_encoded)
-    table.insert(visited, {entry_y, entry_x})
+    table.insert(visited, string.match(entry_point_encoded, "|(.*)"))
     while not paths_queue:isEmpty() do
         path = paths_queue:dequeue()
-        directions_path = directions_queue:dequeue()
-        local last_cell = path[#path]
+        local last_cell = last_cells:dequeue()
         local life, x, y = decode(last_cell)
-        if x == exit_x and y == exit_y then return path, directions_path end
+        if x == exit_x and y == exit_y then return last_cell, path end
         
         local available_moves = move_encode(last_cell, maze)
         for move, direction_life_difference in pairs(available_moves) do
             move_life, move_x, move_y = decode(move)
-            if (not table.contains(visited, {move_y, move_x})) and move_life > 0 then
-                table.insert(visited, {move_y, move_x})
-                local new_path = table.copy(path)
-                local new_direction = table.copy(directions_path)
-                table.insert(new_path, move)
-                table.insert(new_direction, direction_life_difference)
+            if (not table.contains(visited, string.match(move, "|(.*)"))) and move_life > 0 then
+                table.insert(visited, string.match(move, "|(.*)"))
+                local new_path = copy_hashtable(path)
+                new_path[move] = direction_life_difference
                 paths_queue:enqueue(new_path)
-                directions_queue:enqueue(new_direction)
+                last_cells:enqueue(move)
             end
         end
     end
     return false
 end
 
--- input: maze, entry point encoded, coordinates of exit point
--- output: list of all states
--- DFS 
-function dfs(maze, entry_point_encoded, exit_y,exit_x)
-    maze = maze:get_maze()
-    local visited = {}
-    local paths_stack = Stack:Create()
-    local directions_stack = Stack:Create()
-    local path
-    local directions_path
-    paths_stack:push({entry_point_encoded})
-    directions_stack:push({{move="", life_change=0}})
-    entry_life, entry_x, entry_y = decode(entry_point_encoded)
-    table.insert(visited, {entry_y, entry_x})
-    while paths_stack:getn() ~= 0 do
-        path = paths_stack:pop()
-        directions_path = directions_stack:pop()
-        local last_cell = path[#path]
-        local life, x, y = decode(last_cell)
-        
-        if x == exit_x and y == exit_y then
-          local history=create_hashtable()
-          for i=1,#directions_path do
-            local cell=path[i]
-            local direction= directions_path[i]
-            history[cell] = direction
-            end
-          return last_cell, history end
-        local available_moves = move_encode(last_cell, maze)
-        
-        for move, direction_life_difference in pairs(available_moves) do
-            local move_life, move_x, move_y = decode(move)
-            if  table.contains(visited, {move_y, move_x}) == false and move_life > 0 then
-                table.insert(visited, {move_y, move_x})
-                local new_path = table.copy(path)
-                local new_direction = table.copy(directions_path)
-                table.insert(new_path, move)
-                table.insert(new_direction, direction_life_difference)
-                paths_stack:push(new_path)
-                directions_stack:push(new_direction)
-            end
-        end
-    end
-    return nil
-end
 
 --recursive dfs
 function rec_dfs(maze_metatable, entry_point_encoded, exit_y, exit_x)
@@ -384,11 +337,11 @@ function create_solver(algorithm)
             local history_tables = {}
             for i,v in ipairs(start.exit_points) do
               local final_state, visited = algorithm(maze,initial_state(start),v.y,v.x)  --should only return the total hash table and final state
-              if(algorithm == astar or algorithm == dijkstra or algorithm == dfs or algorithm == rec_dfs) then
-                history = gen_path(final_state, visited)
-              else
-                history = visited
-              end
+              --if(algorithm == astar or algorithm == dijkstra or algorithm == dfs or algorithm == rec_dfs or algorithm == bfs) then
+              history = gen_path(final_state, visited)
+              --else
+              --  history = visited
+              --end
               -- history = gen_path(final_state, visited)
               table.insert(history_tables, history)
             end
@@ -418,7 +371,7 @@ end
 --print(gen_path("8|4|6", history))
 --print("---")
 
---local best_history = create_solver(astar)("mazes/maze_1.txt")
+--local best_history = create_solver(bfs)("mazes/maze_1.txt")
 --for k, d in pairs(best_history) do
 --  print(k, d.move, d.life_change)
   

@@ -225,9 +225,6 @@ end
 function run_algorithm(selected_algorithm)
     total_reset()
     history = create_solver(selected_algorithm)(filepath)
-    if selected_algorithm == bfs and history then
-      table.remove(history, 1)
-    end
     if not history then open_no_solution_dialog = true end
 end
 
