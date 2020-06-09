@@ -34,8 +34,8 @@ ENTRANCE = 5
 EXIT = 6
 
 -- tilesets: rows and columns of the tileset
-tiles_rows = 2
-tiles_cols = 3
+maze_rows = 2
+maze_cols = 3
 
 -- tilesets: just insert the tileset path
 ARROWS = "arrow_tileset.png"
@@ -77,7 +77,7 @@ arrow_cols = 7
 
 -- draws a line at x,y with the specified orientation, using the arrow_tileset
 function draw_line(x, y, orientation)
-  Slab.SetCursorPos(x, y + 8)  
+  Slab.SetCursorPos(x-1, y + 8)  
   if orientation == "SOUTH" then
     Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[LINE_VERTICAL].x, SubY = arrow_quads[LINE_VERTICAL].y, SubW = arrow_quads[LINE_VERTICAL].w, SubH = arrow_quads[LINE_VERTICAL].h})
   elseif orientation == "EAST" then
@@ -95,7 +95,7 @@ end
 
 -- draws the path origin with the specified orientation, using the arrow_tileset
 function draw_origin(x, y, orientation)
-  Slab.SetCursorPos(x, y + 8)  
+  Slab.SetCursorPos(x-1, y + 8)  
   if orientation == "SOUTH" then
     Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ORIGIN_SOUTH].x, SubY = arrow_quads[ORIGIN_SOUTH].y, SubW = arrow_quads[ORIGIN_SOUTH].w, SubH = arrow_quads[ORIGIN_SOUTH].h})
   elseif orientation == "NORTH" then
@@ -110,7 +110,7 @@ end
 
 -- draws the last step in the drawn path (the arrow) with the specified orientation, from the arrow_tileset
 function draw_destination(x, y, orientation)
-  Slab.SetCursorPos(x, y + 8)  
+  Slab.SetCursorPos(x-1, y + 8)  
   if orientation == "SOUTH" then
   Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ARROW_SOUTH].x, SubY = arrow_quads[ARROW_SOUTH].y, SubW = arrow_quads[ARROW_SOUTH].w, SubH = arrow_quads[ARROW_SOUTH].h})
   elseif orientation == "NORTH" then
@@ -215,9 +215,9 @@ end
 -- loads indexes and values when a new maze is selected
 -- program entry point is here
 function game_load()
-  total_reset()
   start, maze = init_game_data(filepath)
   tilemap = generate_tilemap(maze):get_maze()
+  total_reset()
 end
 
 
