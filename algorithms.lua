@@ -397,11 +397,11 @@ function create_solver(algorithm)
   return solve
 end
 
-local start, maze = init_game_data("mazes/maze_1.txt")
+--local start, maze = init_game_data("mazes/maze_1.txt")
 --local path, history = bfs(maze,initial_state(start),2,10)
 --local path, history = dfs(maze,initial_state(start),4,6)
 
-local best_history = create_solver(bruteforce)("mazes/maze_1.txt")
+--local best_history = create_solver(bruteforce)("mazes/maze_1.txt")
 
 --local move = table.remove(history)
 
@@ -409,7 +409,7 @@ local best_history = create_solver(bruteforce)("mazes/maze_1.txt")
 --local path, _history = dijkstra(maze,initial_state(start),4,6)
 --astar(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 
-write_maze("test2.lua", start, maze, best_history)
+--write_maze("test2.lua", start, maze, best_history)
 --local final, history = rec_dfs(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x)
 --print(final)
 
