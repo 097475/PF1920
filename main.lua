@@ -22,8 +22,8 @@ PIT = 18
 ENTRANCE = 4
 EXIT = 59
 -- tilesets: rows and columns of the tileset
-tiles_rows = 5
-tiles_cols = 13
+maze_rows = 5
+maze_cols = 13
 
 -- tilesets: just insert the tileset path
 ARROWS = "arrow_tileset.png"
@@ -46,51 +46,67 @@ ARROW_WEST = 15
 arrow_rows = 2
 arrow_cols = 7
 
+-- global variables
+--local start
+--local index
+--local life
+--local current_move
+--local history 
+--local maze
+--local open_no_solution_dialog
+--local open_dialog
+--local save_dialog
+--local filepath
+--local maze_tiles
+--local maze_quads
+--local arrow_tiles
+--local arrow_quads
+--local algorithm_label
 
--- draws a line at x,y with the specified orientation, using the arrow_tileset [PURE]
+-- draws a line at x,y with the specified orientation, using the arrow_tileset
 function draw_line(x, y, orientation)
   Slab.SetCursorPos(x, y + 8)  
   if orientation == "SOUTH" then
-    Slab.Image('Path', { Image = arrow , SubX = arrow_quads[LINE_VERTICAL].x, SubY = arrow_quads[LINE_VERTICAL].y, SubW = arrow_quads[LINE_VERTICAL].w, SubH = arrow_quads[LINE_VERTICAL].h})
+    Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[LINE_VERTICAL].x, SubY = arrow_quads[LINE_VERTICAL].y, SubW = arrow_quads[LINE_VERTICAL].w, SubH = arrow_quads[LINE_VERTICAL].h})
   elseif orientation == "EAST" then
-    Slab.Image('Path', { Image = arrow , SubX = arrow_quads[LINE_HORIZONTAL].x, SubY = arrow_quads[LINE_HORIZONTAL].y, SubW = arrow_quads[LINE_HORIZONTAL].w, SubH = arrow_quads[LINE_HORIZONTAL].h})
+    Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[LINE_HORIZONTAL].x, SubY = arrow_quads[LINE_HORIZONTAL].y, SubW = arrow_quads[LINE_HORIZONTAL].w, SubH = arrow_quads[LINE_HORIZONTAL].h})
   elseif orientation == "SOUTHEAST" then
-    Slab.Image('Path', { Image = arrow , SubX = arrow_quads[LINE_SOUTH_EAST].x, SubY = arrow_quads[LINE_SOUTH_EAST].y, SubW = arrow_quads[LINE_SOUTH_EAST].w, SubH = arrow_quads[LINE_SOUTH_EAST].h})
+    Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[LINE_SOUTH_EAST].x, SubY = arrow_quads[LINE_SOUTH_EAST].y, SubW = arrow_quads[LINE_SOUTH_EAST].w, SubH = arrow_quads[LINE_SOUTH_EAST].h})
   elseif orientation == "SOUTHWEST" then
-    Slab.Image('Path', { Image = arrow , SubX = arrow_quads[LINE_SOUTH_WEST].x, SubY = arrow_quads[LINE_SOUTH_WEST].y, SubW = arrow_quads[LINE_SOUTH_WEST].w, SubH = arrow_quads[LINE_SOUTH_WEST].h})
+    Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[LINE_SOUTH_WEST].x, SubY = arrow_quads[LINE_SOUTH_WEST].y, SubW = arrow_quads[LINE_SOUTH_WEST].w, SubH = arrow_quads[LINE_SOUTH_WEST].h})
   elseif orientation == "NORTHEAST" then
-    Slab.Image('Path', { Image = arrow , SubX = arrow_quads[LINE_NORTH_EAST].x, SubY = arrow_quads[LINE_NORTH_EAST].y, SubW = arrow_quads[LINE_NORTH_EAST].w, SubH = arrow_quads[LINE_NORTH_EAST].h})
+    Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[LINE_NORTH_EAST].x, SubY = arrow_quads[LINE_NORTH_EAST].y, SubW = arrow_quads[LINE_NORTH_EAST].w, SubH = arrow_quads[LINE_NORTH_EAST].h})
   elseif orientation == "NORTHWEST" then
-    Slab.Image('Path', { Image = arrow , SubX = arrow_quads[LINE_NORTH_WEST].x, SubY = arrow_quads[LINE_NORTH_WEST].y, SubW = arrow_quads[LINE_NORTH_WEST].w, SubH = arrow_quads[LINE_NORTH_WEST].h})
+    Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[LINE_NORTH_WEST].x, SubY = arrow_quads[LINE_NORTH_WEST].y, SubW = arrow_quads[LINE_NORTH_WEST].w, SubH = arrow_quads[LINE_NORTH_WEST].h})
   end 
 end
 
--- draws the path origin with the specified orientation, using the arrow_tileset [PURE]
+-- draws the path origin with the specified orientation, using the arrow_tileset
 function draw_origin(x, y, orientation)
   Slab.SetCursorPos(x, y + 8)  
   if orientation == "SOUTH" then
-    Slab.Image('Path', { Image = arrow , SubX = arrow_quads[ORIGIN_SOUTH].x, SubY = arrow_quads[ORIGIN_SOUTH].y, SubW = arrow_quads[ORIGIN_SOUTH].w, SubH = arrow_quads[ORIGIN_SOUTH].h})
+    Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ORIGIN_SOUTH].x, SubY = arrow_quads[ORIGIN_SOUTH].y, SubW = arrow_quads[ORIGIN_SOUTH].w, SubH = arrow_quads[ORIGIN_SOUTH].h})
   elseif orientation == "NORTH" then
-    Slab.Image('Path', { Image = arrow , SubX = arrow_quads[ORIGIN_NORTH].x, SubY = arrow_quads[ORIGIN_NORTH].y, SubW = arrow_quads[ORIGIN_NORTH].w, SubH = arrow_quads[ORIGIN_NORTH].h})
+    Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ORIGIN_NORTH].x, SubY = arrow_quads[ORIGIN_NORTH].y, SubW = arrow_quads[ORIGIN_NORTH].w, SubH = arrow_quads[ORIGIN_NORTH].h})
   elseif orientation == "EAST" then
-    Slab.Image('Path', { Image = arrow , SubX = arrow_quads[ORIGIN_EAST].x, SubY = arrow_quads[ORIGIN_EAST].y, SubW = arrow_quads[ORIGIN_EAST].w, SubH = arrow_quads[ORIGIN_EAST].h})
+    Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ORIGIN_EAST].x, SubY = arrow_quads[ORIGIN_EAST].y, SubW = arrow_quads[ORIGIN_EAST].w, SubH = arrow_quads[ORIGIN_EAST].h})
   elseif orientation == "WEST" then
-    Slab.Image('Path', { Image = arrow , SubX = arrow_quads[ORIGIN_WEST].x, SubY = arrow_quads[ORIGIN_WEST].y, SubW = arrow_quads[ORIGIN_WEST].w, SubH = arrow_quads[ORIGIN_WEST].h})
+    Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ORIGIN_WEST].x, SubY = arrow_quads[ORIGIN_WEST].y, SubW = arrow_quads[ORIGIN_WEST].w, SubH = arrow_quads[ORIGIN_WEST].h})
   end  
 end
 
 
--- draws the last step in the drawn path (the arrow) with the specified orientation, from the arrow_tileset [PURE]
+-- draws the last step in the drawn path (the arrow) with the specified orientation, from the arrow_tileset
 function draw_destination(x, y, orientation)
   Slab.SetCursorPos(x, y + 8)  
   if orientation == "SOUTH" then
-  Slab.Image('Path', { Image = arrow , SubX = arrow_quads[ARROW_SOUTH].x, SubY = arrow_quads[ARROW_SOUTH].y, SubW = arrow_quads[ARROW_SOUTH].w, SubH = arrow_quads[ARROW_SOUTH].h})
+  Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ARROW_SOUTH].x, SubY = arrow_quads[ARROW_SOUTH].y, SubW = arrow_quads[ARROW_SOUTH].w, SubH = arrow_quads[ARROW_SOUTH].h})
   elseif orientation == "NORTH" then
-  Slab.Image('Path', { Image = arrow , SubX = arrow_quads[ARROW_NORTH].x, SubY = arrow_quads[ARROW_NORTH].y, SubW = arrow_quads[ARROW_NORTH].w, SubH = arrow_quads[ARROW_NORTH].h})
+  Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ARROW_NORTH].x, SubY = arrow_quads[ARROW_NORTH].y, SubW = arrow_quads[ARROW_NORTH].w, SubH = arrow_quads[ARROW_NORTH].h})
   elseif orientation == "EAST" then
-  Slab.Image('Path', { Image = arrow , SubX = arrow_quads[ARROW_EAST].x, SubY = arrow_quads[ARROW_EAST].y, SubW = arrow_quads[ARROW_EAST].w, SubH = arrow_quads[ARROW_EAST].h})
+  Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ARROW_EAST].x, SubY = arrow_quads[ARROW_EAST].y, SubW = arrow_quads[ARROW_EAST].w, SubH = arrow_quads[ARROW_EAST].h})
   elseif orientation == "WEST" then
-  Slab.Image('Path', { Image = arrow , SubX = arrow_quads[ARROW_WEST].x, SubY = arrow_quads[ARROW_WEST].y, SubW = arrow_quads[ARROW_WEST].w, SubH = arrow_quads[ARROW_WEST].h})
+  Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ARROW_WEST].x, SubY = arrow_quads[ARROW_WEST].y, SubW = arrow_quads[ARROW_WEST].w, SubH = arrow_quads[ARROW_WEST].h})
   end
 end
 
@@ -101,8 +117,8 @@ function draw_moves(history, current_move)
   while i < current_move do
     i = i + 1
     if i == 1 then
-      move = history[i].move
-      delta_x, delta_y = move_vector(move)
+      local move = history[i].move
+      local delta_x, delta_y = move_vector(move)
       if delta_x == 1 then
         draw_origin((current_x - 1)*width, current_y*height, "EAST")
       elseif delta_x == -1 then
@@ -115,8 +131,8 @@ function draw_moves(history, current_move)
       current_x, current_y = current_x + delta_x, current_y + delta_y
       prev_delta_x, prev_delta_y = delta_x, delta_y
     elseif i <= current_move then
-      move = history[i].move
-      delta_x, delta_y = move_vector(move)
+      local move = history[i].move
+      local delta_x, delta_y = move_vector(move)
       if prev_delta_x ~= 0 and delta_x ~= 0 then
         draw_line((current_x - 1)*width, current_y*height, "EAST")
       elseif prev_delta_y ~= 0 and delta_y ~= 0 then
@@ -134,8 +150,8 @@ function draw_moves(history, current_move)
       prev_delta_x, prev_delta_y = delta_x, delta_y
     end
     if i == current_move then
-      move = history[i].move
-      delta_x, delta_y = move_vector(move)
+      local move = history[i].move
+      local delta_x, delta_y = move_vector(move)
       if delta_x == 1 then
         draw_destination((current_x - 1)*width, current_y*height, "EAST")
       elseif delta_x == -1 then
@@ -150,7 +166,7 @@ function draw_moves(history, current_move)
 end
 
 
--- Converts a maze to a matrix of tile numbers, using the maze as functor [PURE]
+-- Converts a maze to a matrix of tile numbers, using the maze as functor
 function generate_tilemap(maze)
   -- Function that maps each element of the maze to the corresponding tile number [PURE]
   function mapper (element)
@@ -176,42 +192,44 @@ function reset_vitality()
   index = 0
 end
 
+-- resets life and also resets the history, selected algorithm and current move
+function total_reset()
+  reset_vitality()
+  history = nil
+  current_move = 0
+end
+
 
 -- loads indexes and values when a new maze is selected
 -- program entry point is here
 function game_load()
-  current_move = 0
-  index = 0
+  total_reset()
   start, maze = init_game_data(filepath)
-  life = start.vitality
   tilemap = generate_tilemap(maze):get_maze()
 end
 
+
+-- runs the solving algorithm, opens a dialog if no solution is found
 function run_algorithm(selected_algorithm)
-    history = nil
-    current_move = 0
-    index = 0
-    life = start.vitality
+    total_reset()
     history = create_solver(selected_algorithm)(filepath)
-    if selected_algorithm == bfs then
+    if selected_algorithm == bfs and history then
       table.remove(history, 1)
     end
-    if not history then openNoSolutionDialog = true end
+    if not history then open_no_solution_dialog = true end
 end
 
 
 -- love specific function: called only once at start of the program
 -- loads indexes and values that are global for the program, loads up graphics, sets window size
 function love.load(args)
-  filepath = ""
-  image = love.graphics.newImage(TILES)
-  arrow = love.graphics.newImage(ARROWS)
-  local image_width = image:getWidth()
-  local image_height = image:getHeight()
-  tile_quads = {}
-  for i=0, tiles_rows do
-    for j=0, tiles_cols do
-      table.insert(tile_quads, {x = j * width, y = i * height, w = width, h = height})
+  filepath = nil
+  maze_tiles = love.graphics.newImage(TILES)
+  arrow_tiles = love.graphics.newImage(ARROWS)
+  maze_quads = {}
+  for i=0, maze_rows do
+    for j=0, maze_cols do
+      table.insert(maze_quads, {x = j * width, y = i * height, w = width, h = height})
     end
   end
   arrow_quads = {}
@@ -223,7 +241,6 @@ function love.load(args)
   love.window.setTitle("Maze solver")
   love.window.setMode(1000, 500, {resizable=true, vsync = 0})
   love.graphics.setBackgroundColor(0.4, 0.88, 1.0)
-  
   Slab.Initialize(args)
 end
 
@@ -248,8 +265,7 @@ function game_draw()
   
   for i,row in ipairs(tilemap) do
     for j,tile in ipairs(row) do
-      --Draw the image with the correct quad
-      Slab.Image('Tiles', { Image = image , SubX = tile_quads[tile].x, SubY = tile_quads[tile].y, SubW = tile_quads[tile].w, SubH = tile_quads[tile].h})
+      Slab.Image('Tiles', { Image = maze_tiles , SubX = maze_quads[tile].x, SubY = maze_quads[tile].y, SubW = maze_quads[tile].w, SubH = maze_quads[tile].h})
       Slab.SameLine()
       x,y = Slab.GetCursorPos()
       Slab.SetCursorPos(x-4, y)
@@ -274,9 +290,10 @@ function create_menu()
   if Slab.BeginMainMenuBar() then
     if Slab.BeginMenu("File") then
         if Slab.MenuItem("Open") then
-          openDialog = true
+          open_dialog = true
         end
         if Slab.MenuItem("Save") then
+          save_dialog = true
         end
         Slab.Separator()
         if Slab.MenuItem("Quit") then
@@ -287,7 +304,6 @@ function create_menu()
     if Slab.BeginMenu("Solve") then
       if Slab.MenuItem("Depth-First Search")  and maze then
         algorithm_label = "Depth-First Search"
-        --run_algorithm(dfs)
         run_algorithm(rec_dfs)
       end
       if Slab.MenuItem("Breadth-First Search") and maze then
@@ -315,28 +331,44 @@ function create_menu()
     Slab.EndMenu()
   end
   
-  if openDialog then
-    local Result = Slab.FileDialog({AllowMultiSelect = false, Type = 'openfile'})
-    if Result.Button ~= "" then
-      openDialog = false
-      if Result.Button == "OK" then
-				filepath = Result.Files[1]
+  if open_dialog then
+    local result = Slab.FileDialog({AllowMultiSelect = false, Type = 'openfile'})
+    if result.Button ~= "" then
+      open_dialog = false
+      if result.Button == "OK" then
+				filepath = result.Files[1]
+        algorithm_label = nil
         game_load()
 			end
     end
   end
   
-  if openNoSolutionDialog then
-    local Result = Slab.MessageBox("Warning", "The maze has no solution!")
-    if Result == "OK" then
-      openNoSolutionDialog = false
+  if save_dialog then
+    if history then
+      local result = Slab.FileDialog({AllowMultiSelect = false, Type = 'savefile'})
+      if result.Button ~= "" then
+        save_dialog = false
+        if result.Button == "OK" then
+          filepath = result.Files[1]
+          write_maze(filepath, start, maze, history)
+        end
+      end
+    else 
+      save_dialog = false
+    end
+  end
+  
+  if open_no_solution_dialog then
+    local result = Slab.MessageBox("Warning", "The maze has no solution!")
+    if result == "OK" then
+      open_no_solution_dialog = false
     end
   end
 end
 
 
 -- love specific function: called in loop before love.draw
--- the function sets up windows and images to be drawn by the Slab library, and also updates vitality
+-- the function sets up windows and images to be drawn by the Slab library, and also updates vitality and reads key presses
 function love.update(dt)
   Slab.Update(dt)
   create_menu()
@@ -344,7 +376,7 @@ function love.update(dt)
   if history then
     user_input()
   end
-  if filepath ~= "" then
+  if filepath then
     game_update()
     game_draw()
   end
@@ -354,7 +386,6 @@ end
 
 -- love specific function: called in loop after love.update
 -- the function calls Slab to draw the windows set up in love.update
--- [PURE]
 function love.draw()
   Slab.Draw()  
 end
