@@ -6,26 +6,16 @@ require "tbl"
 require "stack"
 require "priority_queue"
 require "hashtable"
-
+fun = require 'fun'
+  
   function calculate_path_value(path, start_life)
-    for i, values in ipairs(path) do
-      start_life = start_life + values.life_change
-    end
-    return start_life
+    return fun.reduce(function(acc, x) return acc + x.life_change end ,start_life, path)
   end
   
   
-  function find_best_path(shortest_paths, life)
-    local best_index = 0
-    local best_value = math.huge
-    for i, path in ipairs(shortest_paths) do
-      local value =  calculate_path_value(shortest_paths[i], life)
-      if value < best_value and value > 0 then
-        best_index = i
-        best_value = value
-      end
-    end
-    return shortest_paths[best_index]
+  function find_best_path(paths, life)
+    local feasible_paths = fun.filter(function(path) return calculate_path_value(path, life) > 0 end, paths)
+    return feasible_paths.state and fun.min_by(function(a, b) if #a < #b or (#a == #b and calculate_path_value(a, life) < calculate_path_value(b, life)) then return a else return b end end, feasible_paths) or nil
   end
   
   
@@ -411,7 +401,7 @@ local start, maze = init_game_data("mazes/maze_1.txt")
 --local path, history = bfs(maze,initial_state(start),2,10)
 --local path, history = dfs(maze,initial_state(start),4,6)
 
-local best_history = create_solver(astar)("mazes/maze_1.txt")
+local best_history = create_solver(bruteforce)("mazes/maze_1.txt")
 
 --local move = table.remove(history)
 
@@ -419,8 +409,7 @@ local best_history = create_solver(astar)("mazes/maze_1.txt")
 --local path, _history = dijkstra(maze,initial_state(start),4,6)
 --astar(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 
-local maze,life= write_path(best_history, maze, 5)
-write_maze(maze,life)
+write_maze("test2.lua", start, maze, best_history)
 --local final, history = rec_dfs(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x)
 --print(final)
 
@@ -434,6 +423,6 @@ write_maze(maze,life)
   
 --end
 
-local t = create_solver(astar)("mazes/multiple_exits.txt")
+--local t = create_solver(astar)("mazes/multiple_exits.txt")
 --bruteforce(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 --find_all_paths(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
