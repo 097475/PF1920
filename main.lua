@@ -14,16 +14,28 @@ width = 32
 height = 32
 
 -- tilesets: just insert the tileset path
-TILES = "scifitiles-sheet.png"
+--TILES = "scifitiles-sheet.png"
 -- tilesets: just put the corresponding tile number
-NOWALL = 21
-WALL = 5
-PIT = 18
-ENTRANCE = 4
-EXIT = 59
+--NOWALL = 21
+--WALL = 5
+--PIT = 18
+--ENTRANCE = 4
+--EXIT = 59
 -- tilesets: rows and columns of the tileset
-tiles_rows = 5
-tiles_cols = 13
+--tiles_rows = 5
+--tiles_cols = 13
+
+TILES = "tileset.png"
+-- tilesets: just put the corresponding tile number
+NOWALL = 1
+WALL = 2
+PIT = 7
+ENTRANCE = 5
+EXIT = 6
+
+-- tilesets: rows and columns of the tileset
+tiles_rows = 2
+tiles_cols = 3
 
 -- tilesets: just insert the tileset path
 ARROWS = "arrow_tileset.png"
