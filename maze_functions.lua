@@ -41,11 +41,11 @@ function gen_path(final, tree)
   -- input: state string final, path string path
   -- output: table representing the steps taken in the path using DULR and life change at each step
   function _gen_path(final, history)
-    if tree[string.match(final, "|(.*)")].move == "" then
+    if tree[final].move == "" then
       return history
     else
-      table.insert(history, 1, tree[string.match(final, "|(.*)")])
-      return _gen_path(invert_move(final, tree[string.match(final, "|(.*)")].move, tree[string.match(final, "|(.*)")].life_change), history)
+      table.insert(history, 1, tree[final])
+      return _gen_path(invert_move(final, tree[final].move, tree[final].life_change), history)
     end
   end
   -- input: state string, move used to get to state, life_chance applied after getting to state
@@ -93,21 +93,19 @@ function get_move_x(x)
 -- output: list rapresenting moves available for a given coordinate
 --[PURE]
 function move_available(maze,y,x)
-   local available = {}
-   if maze[y][x] == "m" or maze[y][x]==nil then
-     return available
-   end
-     for z= -1,1,2 do
-       if maze[y][x+z] ~= "m" and maze[y][x+z]~=nil and maze[y][x+z]~="p" then
-        available[#available+1]=get_move_x(z)
-      end
-      if maze[y+z][x] ~= "m" and maze[y+z][x]~=nil and maze[y+z][x]~="p" then
-        
-        available[#available +1 ]=get_move_y(z)
-       
-      end
-   end
-   return available
+  local available = {}
+  if maze[y][x] == "m" or maze[y][x]==nil then
+    return available
+  end
+  for z= -1,1,2 do
+    if maze[y][x+z] ~= "m" and maze[y][x+z]~=nil and maze[y][x+z]~="p" then
+      available[#available+1]=get_move_x(z)
+    end
+    if maze[y+z][x] ~= "m" and maze[y+z][x]~=nil and maze[y+z][x]~="p" then
+      available[#available +1 ]=get_move_y(z)
+    end
+  end
+  return available
  end
  
  --input: life, maze, coordinates y,x

@@ -379,7 +379,7 @@ end
   
 --end
 
-local t = create_solver(find_all_paths)("mazes/no_solution.txt")
+local t = create_solver(astar)("mazes/maze_1.txt")
 print(t)
 --bruteforce(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 --find_all_paths(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
