@@ -135,48 +135,54 @@ end
 function manhattan(x1, y1, x2, y2)
     return math.abs(x1 - x2) + math.abs(y1 - y2)
 end
---string.match(current, "|(.*)")
+
 function astar(maze, entry_point_encoded, exit_y, exit_x)
-  maze = maze:get_maze()
-  local open = {}
-  local closed = {}
-  local queue = PriorityQueue.new(function(a, b) return ((a.g + a.h > b.g + b.h) or ((a.g + a.h == b.g + b.h) and a.life_change > b.life_change))  end)
-  local init_life, init_x, init_y = decode(entry_point_encoded)
-  local root_values = {g = 0, h = manhattan(init_x, init_y, exit_x, exit_y), move="", life_change=0 }
-  open[string.match(entry_point_encoded, "|(.*)")] = root_values
-  queue:Add(entry_point_encoded, root_values)
-  while queue:Size() > 0 do
+  function _astar(maze, queue, open, closed)
     local current = queue:Pop()
-    --print(current)
-    if open[string.match(current, "|(.*)")] then
-      local current_values = open[string.match(current, "|(.*)")]
-      local current_life, current_x, current_y = decode(current)
-      open[string.match(current, "|(.*)")] = nil
-      closed[string.match(current, "|(.*)")] = {move = current_values.move, life_change = current_values.life_change}
-      if current_x == exit_x and current_y == exit_y then
-        return current, closed -- last state, and hashmap with path to rebuild
-      else
-        local available_moves = move_encode(current, maze)
-        for next_state, values in pairs(available_moves) do
-          local next_life, next_x, next_y = decode(next_state)
-          local next_state_values = { g = current_values.g + 1, h = manhattan(next_x, next_y, exit_x, exit_y), move = values.move, life_change = values.life_change }
-          if closed[string.match(next_state, "|(.*)")] == nil and next_life > 0 then
-            if open[string.match(next_state, "|(.*)")] == nil then
-              open[string.match(next_state, "|(.*)")] = next_state_values
-              queue:Add(next_state, next_state_values)
-            else
-              local alternative_node_values = open[string.match(next_state, "|(.*)")]
-              if next_state_values.g < alternative_node_values.g then
-                open[string.match(next_state, "|(.*)")] = next_state_values
+    if not current then return nil, nil
+    else
+      if open[current] then
+        local current_values = open[current]
+        local current_life, current_x, current_y = decode(current)
+        open[current] = nil
+        closed[current] = {move = current_values.move, life_change = current_values.life_change}
+        if current_x == exit_x and current_y == exit_y then
+          return current, closed -- last state, and hashmap with path to rebuild
+        else
+          local available_moves = move_encode(current, maze)
+          for next_state, values in pairs(available_moves) do
+            local next_life, next_x, next_y = decode(next_state)
+            local next_state_values = { g = current_values.g + 1, h = manhattan(next_x, next_y, exit_x, exit_y), move = values.move, life_change = values.life_change }
+            if closed[next_state] == nil and next_life > 0 then
+              if open[next_state] == nil then
+                open[next_state] = next_state_values
                 queue:Add(next_state, next_state_values)
+              else
+                local alternative_node_values = open[next_state]
+                if next_state_values.g < alternative_node_values.g then
+                  open[next_state] = next_state_values
+                  queue:Add(next_state, next_state_values)
+                end
               end
             end
           end
         end
       end
+      return _astar(maze, queue, open, closed)
     end
   end
+
+  maze = maze:get_maze()
+  local open = create_hashtable()
+  local closed = create_hashtable()
+  local queue = PriorityQueue.new(function(a, b) return ((a.g + a.h > b.g + b.h) or ((a.g + a.h == b.g + b.h) and a.life_change > b.life_change))  end)
+  local init_life, init_x, init_y = decode(entry_point_encoded)
+  local root_values = {g = 0, h = manhattan(init_x, init_y, exit_x, exit_y), move="", life_change=0 }
+  open[entry_point_encoded] = root_values
+  queue:Add(entry_point_encoded, root_values)
+  return _astar(maze, queue, open, closed)
 end
+
 -- input: maze, entry point encoded, coordinates of exit point
 -- output: list of all states
 function bfs(maze, entry_point_encoded, exit_y, exit_x)
@@ -377,6 +383,6 @@ end
   
 --end
 
---local t = create_solver(astar)("mazes/multiple_exits.txt")
+local t = create_solver(astar)("mazes/multiple_exits.txt")
 --bruteforce(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 --find_all_paths(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
