@@ -17,8 +17,6 @@ fun = require 'fun'
     local feasible_paths = fun.filter(function(path) return calculate_path_value(path, life) > 0 end, paths)
     return feasible_paths.state and fun.min_by(function(a, b) if #a < #b or (#a == #b and calculate_path_value(a, life) < calculate_path_value(b, life)) then return a else return b end end, feasible_paths) or nil
   end
-  
-  
 
 function bruteforce(maze, entry_point_encoded, exit_y, exit_x)
   
