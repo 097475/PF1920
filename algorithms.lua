@@ -13,11 +13,15 @@ fun = require 'fun'
   end
   
   
-  function find_best_path(paths, life)
+  function find_best_path2(paths, life)
     local feasible_paths = fun.filter(function(path) return calculate_path_value(path, life) > 0 end, paths)
     return feasible_paths.state and fun.min_by(function(a, b) if #a < #b or (#a == #b and calculate_path_value(a, life) < calculate_path_value(b, life)) then return a else return b end end, feasible_paths) or nil
   end
   
+    function find_best_path(paths, life)
+    local feasible_paths = fun.filter(function(path) return calculate_path_value(path, life) > 0 end, paths)
+    return not fun.is_null(feasible_paths) and fun.min_by(function(a, b) if #a < #b or (#a == #b and calculate_path_value(a, life) < calculate_path_value(b, life)) then return a else return b end end, feasible_paths) or nil
+  end
   
 
 function bruteforce(maze, entry_point_encoded, exit_y, exit_x)
@@ -337,25 +341,47 @@ end
 
 
 -- check when history is null because no path exists
-function create_solver(algorithm)
+function create_solver2(algorithm)
   solve = function(maze_filepath) 
             local start, maze = init_game_data(maze_filepath)
             local history_tables = {}
             for i,v in ipairs(start.exit_points) do
-              local final_state, visited = algorithm(maze,initial_state(start),v.y,v.x)  --should only return the total hash table and final state
-              --if(algorithm == astar or algorithm == dijkstra or algorithm == dfs or algorithm == rec_dfs or algorithm == bfs) then
-              history = gen_path(final_state, visited)
-              --else
-              --  history = visited
-              --end
-              -- history = gen_path(final_state, visited)
+              local final_state, visited = algorithm(maze,initial_state(start),v.y,v.x)  --should only return the total 
+              if algorithm ~= find_all_paths and algorithm ~= bruteforce then
+                history = gen_path(final_state, visited)
+              else
+                history = visited
+              end
               table.insert(history_tables, history)
             end
-            -- <-- here, select the best history in history_tables, for now we select the first-->
             return find_best_path(history_tables, start.vitality) -- return the path
           end
   return solve
 end
+
+-- check when history is null because no path exists
+function create_solver(algorithm)
+  function run(start, maze) 
+    for i,v in ipairs(start.exit_points) do
+      local final_state, visited = algorithm(maze,initial_state(start),v.y,v.x)  --should only return the total 
+        if algorithm ~= find_all_paths and algorithm ~= bruteforce then
+          history = gen_path(final_state, visited)
+        else
+          history = visited
+        end
+      coroutine.yield(history)
+    end
+  end
+  
+  solve = function(maze_filepath) 
+            local history_tables = {}
+            local start, maze = init_game_data(maze_filepath)
+            return find_best_path(fun.totable(fun.take(function(x) return x end, fun.tabulate(coroutine.wrap(function() run(start, maze) end)))), start.vitality)
+          end
+          
+  return solve
+end
+
 
 --local start, maze = init_game_data("mazes/maze_1.txt")
 --local path, history = bfs(maze,initial_state(start),2,10)
@@ -383,6 +409,6 @@ end
   
 --end
 
-local t = create_solver(astar)("mazes/multiple_exits.txt")
+local t = create_solver(rec_dfs)("mazes/maze_1.txt")
 --bruteforce(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 --find_all_paths(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
