@@ -33,10 +33,12 @@ function print_table(tab)
   end
 end
 
--- input: maze modified with * and life updated
- -- output: writing file with maze modified
+-- input: filepath, start, maze , history
+ -- output: writing file with maze modified with * 
 function write_maze(filepath, start, maze, history)
   
+  --input: maze, history,x,y,life
+  --output: final life
   function write_path(maze, history, x, y, life)
     if fun.tail(history).state then
       local move = fun.head(history)

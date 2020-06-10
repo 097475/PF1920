@@ -11,8 +11,7 @@ fun = require 'fun'
   function calculate_path_value(path, start_life)
     return fun.reduce(function(acc, x) return acc + x.life_change end ,start_life, path)
   end
-  
-  
+
   function find_best_path(paths, life)
     local feasible_paths = fun.filter(function(path) return calculate_path_value(path, life) > 0 end, paths)
     return feasible_paths.state and fun.min_by(function(a, b) if #a < #b or (#a == #b and calculate_path_value(a, life) < calculate_path_value(b, life)) then return a else return b end end, feasible_paths) or nil

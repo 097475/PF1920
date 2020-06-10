@@ -61,6 +61,7 @@ function gen_path(final, tree)
 
 --input x position
  --output: move for x parameter "L" or "R"
+ --[PURE]
 function get_move_x(x)
   local position
     if  x == -1  then
@@ -75,6 +76,7 @@ function get_move_x(x)
   
   --input: y position
   -- output: move for y parameter "D" or "U"
+  --[PURE]
   function get_move_y(y)
   local position
     if   y==1 then
@@ -89,6 +91,7 @@ function get_move_x(x)
   
 -- input maze and coordinate x,y
 -- output: list rapresenting moves available for a given coordinate
+--[PURE]
 function move_available(maze,y,x)
    local available = {}
    if maze[y][x] == "m" or maze[y][x]==nil then
@@ -109,6 +112,7 @@ function move_available(maze,y,x)
  
  --input: life, maze, coordinates y,x
  -- output: new life update according to logic of program
+ --[PURE]
 function life_update(life,maze,y,x)
   local new_life
   local cell = maze[y][x]
@@ -142,6 +146,7 @@ end
 
 -- input: state encoding, maze
 -- output: return move available in a specific format with life|position and move|life change
+--[PURE]
 function move_encode(encode_state, maze)
   local life,x,y=decode(encode_state)
   local move={}
@@ -158,6 +163,7 @@ function move_encode(encode_state, maze)
 
 --input: starting position in the maze with vitality, entry point x,y
 --output: return state encode with life|x|y
+--[PURE]
 function initial_state(start)
  local encode= encode(start.vitality, start.entry_point.x,start.entry_point.y)
   return encode
