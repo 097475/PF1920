@@ -147,7 +147,6 @@ function API.SetStyle(Name)
 				end
 			end
 		end
-
 		return true
 	else
 		print("Style '" .. Name .. "' is not loaded.")

@@ -12,12 +12,6 @@ fun = require 'fun'
     return fun.reduce(function(acc, x) return acc + x.life_change end ,start_life, path)
   end
   
-  
-  function find_best_path2(paths, life)
-    local feasible_paths = fun.filter(function(path) return calculate_path_value(path, life) > 0 end, paths)
-    return feasible_paths.state and fun.min_by(function(a, b) if #a < #b or (#a == #b and calculate_path_value(a, life) < calculate_path_value(b, life)) then return a else return b end end, feasible_paths) or nil
-  end
-  
     function find_best_path(paths, life)
     local feasible_paths = fun.filter(function(path) return calculate_path_value(path, life) > 0 end, paths)
     return not fun.is_null(feasible_paths) and fun.min_by(function(a, b) if #a < #b or (#a == #b and calculate_path_value(a, life) < calculate_path_value(b, life)) then return a else return b end end, feasible_paths) or nil
@@ -28,73 +22,66 @@ function bruteforce(maze, entry_point_encoded, exit_y, exit_x)
   
   local paths = {}
   
-  function expand_node(node, path, current_path)
+  function expand_node(node, current_path, move_sequence)
     local life, current_x, current_y = decode(node)
     
     if current_x == exit_x and current_y == exit_y then
-      paths[#paths+1] = table.copy(current_path)
-      path[node] = nil
-      current_path[#current_path] = nil
+      paths[#paths+1] = table.copy(move_sequence)
+      current_path[node] = nil
+      move_sequence[#move_sequence] = nil
     else
       local available_moves = move_encode(node, maze)
       for next_state, values in pairs(available_moves) do    
-        if path[next_state] == nil then
-          path[next_state] = true
-          current_path[#current_path + 1] = values
-          expand_node(next_state, path, current_path)
+        if current_path[next_state] == nil then
+          current_path[next_state] = true
+          move_sequence[#move_sequence + 1] = values
+          expand_node(next_state, current_path, move_sequence)
         end
       end
-    path[node] = nil
-    current_path[#current_path] = nil
+    current_path[node] = nil
+    move_sequence[#move_sequence] = nil
     end
   end
   
   
   maze = maze:get_maze()
-  local path = create_hashtable()
-  path[entry_point_encoded] = true
-  expand_node(entry_point_encoded, path, {})
+  local current_path = create_hashtable()
+  current_path[entry_point_encoded] = true
+  expand_node(entry_point_encoded, current_path, {})
   
   local life, _, _ = decode(entry_point_encoded)
-  return nil, find_best_path(paths, life)
+  return find_best_path(paths, life)
 end
 
 
 function find_all_paths(maze, entry_point_encoded, exit_y, exit_x)
-  
-  function depth_first_search(node, visited, paths, current_path)
+  local visited = create_hashtable()
+  local paths = {}
+  function depth_first_search(node, visited, current_path)
 
-    
     if #visited[node].parents == 0 then
       paths[#paths+1] = table.reverse(current_path)
     end
     
     for i, parent in ipairs(visited[node].parents) do
       current_path[#current_path+1] = {move = parent.move, life_change = parent.life_change}
-      depth_first_search(parent.state, visited, paths, current_path)
+      depth_first_search(parent.state, visited, current_path)
     end
     
     current_path[#current_path] = nil
     
   end
   
-    maze = maze:get_maze()
-    local queue = Queue:new()
-    local open = create_hashtable()
-    local visited = create_hashtable()
-    queue:enqueue(entry_point_encoded)
-    open[entry_point_encoded] = {level=0, parents = {}}
-    
-    local nodeTo = nil
-    while not queue:isEmpty() do
+  function breadth_first_search(queue, open)
       local current = queue:dequeue()
+      if not current then return nil end
+      
       local current_life, current_x, current_y = decode(current)
       local current_level = open[current].level
       
       if current_x == exit_x and current_y == exit_y then
-        nodeTo = current
         visited[current] = open[current]
-        break
+        return current
       end
       
       local available_moves = move_encode(current, maze)
@@ -115,18 +102,24 @@ function find_all_paths(maze, entry_point_encoded, exit_y, exit_x)
       
       visited[current] = open[current]
       open[current] = nil
-      
+      return breadth_first_search(queue, open ,visited)
     end
     
-    if nodeTo == nil then
-      return nil, nil
-    end
     
-    local paths = {}
-    depth_first_search(nodeTo, visited, paths, {})
     
-    local life, _, _ = decode(entry_point_encoded)
-    return nodeTo, find_best_path(paths, life)
+    
+  maze = maze:get_maze()
+  local queue = Queue:new()
+  local open = create_hashtable()
+  queue:enqueue(entry_point_encoded)
+  open[entry_point_encoded] = {level=0, parents = {}}
+    
+  local target = breadth_first_search(queue, open)
+    
+
+  if target then depth_first_search(target, visited, {}) end
+  local life, _, _ = decode(entry_point_encoded)
+  return find_best_path(paths, life)
 end
 
 
@@ -184,55 +177,53 @@ function astar(maze, entry_point_encoded, exit_y, exit_x)
   local root_values = {g = 0, h = manhattan(init_x, init_y, exit_x, exit_y), move="", life_change=0 }
   open[entry_point_encoded] = root_values
   queue:Add(entry_point_encoded, root_values)
-  return _astar(maze, queue, open, closed)
+  return gen_path(_astar(maze, queue, open, closed))
 end
 
 -- input: maze, entry point encoded, coordinates of exit point
 -- output: list of all states
 function bfs(maze, entry_point_encoded, exit_y, exit_x)
-    maze = maze:get_maze()
-    local visited = {}
-    --queue containing paths
-    local paths_queue = Queue:new()
-    --queue containing the last cell for each path
-    local last_cells = Queue:new()
-    --initialize the first path adding the entry point and its life
-    local first_path = create_hashtable()
-    first[entry_point_encoded] = {move="", life_change=0}
-    paths_queue:enqueue(first)
-    last_cells:enqueue(entry_point_encoded)
-
-    entry_life, entry_x, entry_y = decode(entry_point_encoded)
-    table.insert(visited, string.match(entry_point_encoded, "|(.*)"))
-    while not paths_queue:isEmpty() do
-
-        local path = paths_queue:dequeue()
-        local last_cell = last_cells:dequeue()
-        local life, x, y = decode(last_cell)
-        --current cell is the exit point: return the path
-        if x == exit_x and y == exit_y then return last_cell, path end
+  function _bfs(paths_queue, last_cells, visited)
+    local path = paths_queue:dequeue()
+    if not path then return nil, nil end
+    local last_cell = last_cells:dequeue()
+    local life, x, y = decode(last_cell)
+    if x == exit_x and y == exit_y then return last_cell, path end
         
-        local available_moves = move_encode(last_cell, maze)
-        for move, direction_life_difference in pairs(available_moves) do
-            move_life, move_x, move_y = decode(move)
-            if (not table.contains(visited, string.match(move, "|(.*)"))) and move_life > 0 then
-                table.insert(visited, string.match(move, "|(.*)"))
-                --update the path adding the move
-                local new_path = copy_hashtable(path)
-                new_path[move] = direction_life_difference
-                --update queues
-                paths_queue:enqueue(new_path)
-                last_cells:enqueue(move)
-            end
+    local available_moves = move_encode(last_cell, maze)
+    for move, direction_life_difference in pairs(available_moves) do
+        move_life, move_x, move_y = decode(move)
+        if not visited[move] and move_life > 0 then
+            visited[move] = true
+            local new_path = copy_hashtable(path)
+            new_path[move] = direction_life_difference
+            paths_queue:enqueue(new_path)
+            last_cells:enqueue(move)
         end
     end
-    return false
+    return _bfs(paths_queue, last_cells, visited)
+  end
+  maze = maze:get_maze()
+  local visited = create_hashtable()
+  local paths_queue = Queue:new()
+  local last_cells = Queue:new()
+  local first = create_hashtable()
+  first[entry_point_encoded] = {move="", life_change=0}
+  paths_queue:enqueue(first)
+  last_cells:enqueue(entry_point_encoded)
+  entry_life, entry_x, entry_y = decode(entry_point_encoded)
+  visited[entry_point_encoded] = true 
+    
+  return gen_path(_bfs(paths_queue, last_cells, visited))
+    
 end
 
 
 --recursive dfs
 function rec_dfs(maze_metatable, entry_point_encoded, exit_y, exit_x)
-
+  
+  local visited = create_hashtable()
+  
   local function _rec_dfs(current_cell_encoded, current_path, maze_grid)
     local life, x, y = decode(current_cell_encoded)
     if x == exit_x and y == exit_y then
@@ -241,29 +232,20 @@ function rec_dfs(maze_metatable, entry_point_encoded, exit_y, exit_x)
     local available_moves = move_encode(current_cell_encoded, maze_grid)
     for move, direction_life_difference in pairs(available_moves) do
       move_life, move_x, move_y = decode(move)
-      if (not table.contains(visited_dfs, string.match(move, "|(.*)"))) and move_life > 0 and current_path[move] == nil then
+      if not visited[move] and move_life > 0 and current_path[move] == nil then
           local new_path = copy_hashtable(current_path)
           new_path[move] = direction_life_difference
-          --call _rec_dfs for this new path
           local final, history = _rec_dfs(move, new_path, maze_grid)
-          --if solution is not nil it means that a valid path has been found: return it
-          if final ~= nil and history ~= nil then return final, history end
+          if final and history then return final, history end
       end 
     end
-    table.insert(visited_dfs, string.match(current_cell_encoded, "|(.*)"))
+    visited[current_cell_encoded] = true
   end
 
-  --this table is set to global: _rec_dfs will refer to it
-  visited_dfs = {}
   local maze = maze_metatable:get_maze()
-  exit_x = exit_x
-  exit_y = exit_y
-
-  --initialize hashtable with the first cell
   local path = create_hashtable()
   path[entry_point_encoded] = {move = "", life_change = 0}
-
-  return _rec_dfs(entry_point_encoded, path, maze)
+  return gen_path(_rec_dfs(entry_point_encoded, path, maze))
 end
 
 
@@ -272,19 +254,17 @@ function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
     local entry_life, entry_x, entry_y = decode(entry_point_encoded)
     local maze = maze_metatable:get_maze()
     local walkable_cells = maze_metatable:get_walkable_cells()
-    --preparation of tables for building priority queue
     local distances = {}
     local cells = {}
     for i = 1,#walkable_cells do
         cells[i] = {}
         cells[i].x = walkable_cells[i].x
         cells[i].y = walkable_cells[i].y
-        --entry point has defined distance, life and direction_life_difference
+        cells[i].previous = nil
         if entry_x == walkable_cells[i].x and entry_y == walkable_cells[i].y then
             distances[i] = 0
             cells[i].life = entry_life
             cells[i].direction_life_difference = {move = "", life_change = 0}
-        --others are initialized with huge distance
         else 
             distances[i] = 10000
             cells[i].life = nil
@@ -292,9 +272,7 @@ function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
         end
     end
     local priority_queue = PriorityQueue:CreateFromTables(cells, distances)
-
-    --hashtable storing visited cells
-    local visited = create_hashtable()
+    local visited = {}
     
     while priority_queue:Size() > 0 do
 
@@ -309,7 +287,6 @@ function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
         end
         assert(cell_index ~= nil, "This cell does not exist in the cells table.")
 
-        --update cells and distances tables for remving current cell from priority queue and updating distances too
         table.remove(distances, cell_index)
         table.remove(cells, cell_index)
         
@@ -317,60 +294,51 @@ function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
         local available_moves = move_encode(encode(cell.life, cell.x, cell.y), maze)
 
         for move, direction_life_difference in pairs(available_moves) do
-          local move_life, move_x, move_y = decode(move)
-          if move_life > 0 then
-            --retrieve index from cells table
-              local index = nil
-              for k,v in pairs(cells) do
-                  if v.x == move_x and v.y == move_y then index = k break end
-              end
-              if index ~= nil then
-                --since the graph is not weighted, the increment of distance from a previous cell is 1
-                if distance + 1 < distances[index] then
-                  distances[index] = distance + 1
-                  cells[index].direction_life_difference = direction_life_difference
-                  cells[index].life = move_life
+            local move_life, move_x, move_y = decode(move)
+            if move_life > 0 then
+              --retrieve index from cells table
+                local index = nil
+                for k,v in pairs(cells) do
+                    if v.x == move_x and v.y == move_y then index = k break end
                 end
-              end   
-          end
+                if index ~= nil then
+                    if distance + 1 < distances[index] then
+                        distances[index] = distance + 1
+                        cells[index].direction_life_difference = direction_life_difference
+                        cells[index].life = move_life
+                        cells[index].previous = encode(cell.life, cell.x, cell.y)
+                    end
+                end
+                
+            end
         end
         priority_queue = PriorityQueue:CreateFromTables(cells, distances)
-        visited[encode(cell.life, cell.x, cell.y)] = cell.direction_life_difference
-
-        if cell.x == exit_x and cell.y == exit_y then return encode(cell.life, cell.x, cell.y), visited end
+        table.insert(visited, {encode(cell.life, cell.x, cell.y), cell.direction_life_difference, cell.previous})
+        if cell.x == exit_x and cell.y == exit_y then
+            local reversed_history = create_hashtable()
+            local current_cell = visited[#visited]
+            local previous = current_cell[3]
+            while previous ~= nil do
+                reversed_history[current_cell[1]] = current_cell[2]
+                for _,k in pairs(visited) do
+                    if previous == k[1] then
+                        current_cell = k
+                        previous = k[3]
+                    end
+                end
+            end
+            reversed_history[visited[1][1]] = visited[1][2]
+            return gen_path(encode(cell.life, cell.x, cell.y), reversed_history)
+        end
     end
 end
 
 
 -- check when history is null because no path exists
-function create_solver2(algorithm)
-  solve = function(maze_filepath) 
-            local start, maze = init_game_data(maze_filepath)
-            local history_tables = {}
-            for i,v in ipairs(start.exit_points) do
-              local final_state, visited = algorithm(maze,initial_state(start),v.y,v.x)  --should only return the total 
-              if algorithm ~= find_all_paths and algorithm ~= bruteforce then
-                history = gen_path(final_state, visited)
-              else
-                history = visited
-              end
-              table.insert(history_tables, history)
-            end
-            return find_best_path(history_tables, start.vitality) -- return the path
-          end
-  return solve
-end
-
--- check when history is null because no path exists
 function create_solver(algorithm)
   function run(start, maze) 
     for i,v in ipairs(start.exit_points) do
-      local final_state, visited = algorithm(maze,initial_state(start),v.y,v.x)  --should only return the total 
-        if algorithm ~= find_all_paths and algorithm ~= bruteforce then
-          history = gen_path(final_state, visited)
-        else
-          history = visited
-        end
+      local history = algorithm(maze,initial_state(start),v.y,v.x)  --should only return the total 
       coroutine.yield(history)
     end
   end
@@ -411,6 +379,7 @@ end
   
 --end
 
-local t = create_solver(rec_dfs)("mazes/maze_1.txt")
+local t = create_solver(find_all_paths)("mazes/no_solution.txt")
+print(t)
 --bruteforce(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 --find_all_paths(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )

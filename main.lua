@@ -8,6 +8,7 @@ require "input-output"
 require "algorithms"
 -- import of Slab library
 local Slab = require 'Slab'
+local Style = require 'Slab/Style'
 
 -- tilesets: size of a single tile
 width = 32
