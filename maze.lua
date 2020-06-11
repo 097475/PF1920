@@ -45,7 +45,7 @@ end
 function Maze:is_valid()
     local n_cols = #self.rows[1]
     for key, row in pairs(self.rows) do
-        if #row ~= n_cols then do return false end end
+        if #row ~= n_cols then return false end
     end
     return true
 end
@@ -58,12 +58,9 @@ function Maze:find_points(symbol)
     local points = {}
     for row_key, row_table in pairs(self.rows) do
         for col_key, element in pairs(row_table) do
-        if element == symbol then
-            local points_index = #points + 1
-            points[points_index] = {}
-            points[points_index].x = col_key
-            points[points_index].y = row_key
-        end
+          if element == symbol then
+            points[#points + 1] = {x = col_key, y = row_key}
+          end
         end
     end
     return points
@@ -82,12 +79,9 @@ function Maze:get_walkable_cells()
     local points = {}
     for row_key, row_table in pairs(self.rows) do
         for col_key, element in pairs(row_table) do
-        if element ~= "m" then
-            local points_index = #points + 1
-            points[points_index] = {}
-            points[points_index].x = col_key
-            points[points_index].y = row_key
-        end
+          if element ~= "m" then
+            points[#points + 1] = {x = col_key, y = row_key}
+          end
         end
     end
     return points
@@ -104,12 +98,10 @@ end
 
 -- builds the start table: it contains vitality of the player, entry point and exit points
 function build_start_table(lines_table, maze)
-  start = {}
-  start.vitality = lines[1]
+  local start = {}
+  start.vitality = lines_table[1]
   assert(maze:entry_point_validity(), "The maze file must contain only one entry point.")
-  local entry_point = maze:find_points("i")[1]
-  start.entry_point = {}
-  start.entry_point = entry_point
+  start.entry_point = maze:find_points("i")[1]
   start.exit_points = maze:find_points("u")
   return start
 end
@@ -122,7 +114,3 @@ function init_game_data(filename)
   local start = build_start_table(lines, maze)
   return start, maze
 end
-
---local start, maze = init_game_data("mazes/maze_1.txt")
---print(start)
---print(maze)

@@ -3,7 +3,6 @@ require "maze"
 require "maze_functions"
 require "queue"
 require "tbl"
-require "stack"
 require "priority_queue"
 require "hashtable"
 fun = require 'fun'
