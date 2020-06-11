@@ -1,5 +1,5 @@
 require "maze_functions"
-fun = require "fun"
+fun = require "lib/fun"
 
 --input: file with maze
 --output: return all lines of the maze

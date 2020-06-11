@@ -1,11 +1,11 @@
 require "input-output"
 require "maze"
 require "maze_functions"
-require "queue"
+require "lib/queue"
 require "tbl"
-require "priority_queue"
+require "lib/priority_queue"
 require "hashtable"
-fun = require 'fun'
+fun = require 'lib/fun'
   
   function calculate_path_value(path, start_life)
     return fun.reduce(function(acc, x) return acc + x.life_change end ,start_life, path)
