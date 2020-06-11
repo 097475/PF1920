@@ -48,7 +48,7 @@ function write_maze(filepath, start, maze, history)
   local x = start.entry_point.x
   local y = start.entry_point.y
 
-  local final_life = history and write_path(maze_output, fun.iter(history), x, y, start.vitality) or start.initial_life
+  local final_life = history and write_path(maze_output, fun.iter(history), x, y, start.initial_life  ) or start.initial_life
   
   local file = io.open(filepath, "w")
   file:write(final_life, "\n")

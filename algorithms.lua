@@ -336,7 +336,7 @@ function create_solver(algorithm)
   solve = function(maze_filepath) 
             local history_tables = {}
             local start, maze = init_game_data(maze_filepath)
-            return find_best_path(fun.totable(fun.take(function(x) return x end, fun.tabulate(coroutine.wrap(function() run(start, maze) end)))), start.vitality)
+            return find_best_path(fun.totable(fun.take(function(x) return x end, fun.tabulate(coroutine.wrap(function() run(start, maze) end)))), start.initial_life)
           end
           
   return solve

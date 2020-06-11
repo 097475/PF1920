@@ -160,5 +160,5 @@ end
 --output: return initial state encoded e.g. "5|3|2" for initial life 5, initial position x = 3, y = 2
 --[PURE]
 function initial_state(start)
-  return encode(start.vitality, start.entry_point.x,start.entry_point.y)
+  return encode(start.initial_life, start.entry_point.x,start.entry_point.y)
 end

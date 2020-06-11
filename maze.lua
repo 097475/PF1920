@@ -116,7 +116,7 @@ end
 --[PURE]
 function build_start_table(life, maze)
   local start = {}
-  start.vitality = life
+  start.initial_life = life
   assert(maze:entry_point_validity(), "The maze file must contain only one entry point.")
   start.entry_point = maze:find_points("i")[1]
   start.exit_points = maze:find_points("u")

@@ -200,7 +200,7 @@ end
 
 -- resets life to initial life, index is reset to 0 to restart the life calculation from start
 function reset_vitality() 
-  life = start.vitality
+  life = start.initial_life
   index = 0
 end
 
