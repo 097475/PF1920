@@ -26,10 +26,10 @@ end
 
 --input
 function Maze:initialize(lines_table)
-    for i=1,#lines-1 do
+    for i=1,#lines_table-1 do
         row = {}
         -- need to skip first row: reserved for vitality
-        for cell in lines[i + 1]:gmatch"." do
+        for cell in lines_table[i + 1]:gmatch"." do
           if tonumber(cell) ~= nil then cell = tonumber(cell) end
           row[#row + 1] = cell
         end
@@ -39,7 +39,7 @@ end
 
 --output number of maze rows
 function Maze:maze_dimension()
-    return #rows
+    return #self.rows
 end
 
 function Maze:is_valid()
@@ -51,7 +51,7 @@ function Maze:is_valid()
 end
 
 function Maze:is_empty()
-    return #self.rows
+    return #self.rows == 0
 end
 
 function Maze:find_points(symbol)
