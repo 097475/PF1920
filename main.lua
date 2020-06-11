@@ -25,7 +25,7 @@ height = 32
 --tiles_rows = 5
 --tiles_cols = 13
 
-TILES = "maze_tileset.png"
+TILES = "graphics/maze_tileset.png"
 -- tilesets: just put the corresponding tile number
 NOWALL = 1
 WALL = 2
@@ -38,7 +38,7 @@ maze_rows = 2
 maze_cols = 3
 
 -- tilesets: just insert the tileset path
-ARROWS = "arrow_tileset.png"
+ARROWS = "graphics/arrow_tileset.png"
 -- tilesets: just put the corresponding tile number
 ORIGIN_NORTH = 1
 ORIGIN_SOUTH = 2
