@@ -7,8 +7,7 @@ require "input-output"
 -- import of algorithms module
 require "algorithms"
 -- import of Slab library
-local Slab = require 'Slab'
-local Style = require 'Slab/Style'
+local Slab = require 'lib/Slab'
 
 -- tilesets: size of a single tile
 width = 32
@@ -78,7 +77,7 @@ arrow_cols = 7
 
 -- draws a line at x,y with the specified orientation, using the arrow_tileset
 function draw_line(x, y, orientation)
-  Slab.SetCursorPos(x-2, y + 24)  
+  Slab.SetCursorPos(x-1, y + 24)  
   if orientation == "SOUTH" then
     Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[LINE_VERTICAL].x, SubY = arrow_quads[LINE_VERTICAL].y, SubW = arrow_quads[LINE_VERTICAL].w, SubH = arrow_quads[LINE_VERTICAL].h})
   elseif orientation == "EAST" then
@@ -96,7 +95,7 @@ end
 
 -- draws the path origin with the specified orientation, using the arrow_tileset
 function draw_origin(x, y, orientation)
-  Slab.SetCursorPos(x-2, y + 24)  
+  Slab.SetCursorPos(x-1, y + 24)  
   if orientation == "SOUTH" then
     Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ORIGIN_SOUTH].x, SubY = arrow_quads[ORIGIN_SOUTH].y, SubW = arrow_quads[ORIGIN_SOUTH].w, SubH = arrow_quads[ORIGIN_SOUTH].h})
   elseif orientation == "NORTH" then
@@ -111,7 +110,7 @@ end
 
 -- draws the last step in the drawn path (the arrow) with the specified orientation, from the arrow_tileset
 function draw_destination(x, y, orientation)
-  Slab.SetCursorPos(x-2, y + 24)  
+  Slab.SetCursorPos(x-1, y + 24)  
   if orientation == "SOUTH" then
   Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ARROW_SOUTH].x, SubY = arrow_quads[ARROW_SOUTH].y, SubW = arrow_quads[ARROW_SOUTH].w, SubH = arrow_quads[ARROW_SOUTH].h})
   elseif orientation == "NORTH" then
@@ -239,7 +238,7 @@ function love.load(args)
   maze_quads = {}
   for i=0, maze_rows do
     for j=0, maze_cols do
-      table.insert(maze_quads, {x = j * width, y = i * height, w = width-1, h = height})
+      table.insert(maze_quads, {x = j * width, y = i * height, w = width, h = height})
     end
   end
   arrow_quads = {}
