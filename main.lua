@@ -26,7 +26,7 @@ height = 32
 --tiles_rows = 5
 --tiles_cols = 13
 
-TILES = "tileset.png"
+TILES = "maze_tileset.png"
 -- tilesets: just put the corresponding tile number
 NOWALL = 1
 WALL = 2
@@ -78,7 +78,7 @@ arrow_cols = 7
 
 -- draws a line at x,y with the specified orientation, using the arrow_tileset
 function draw_line(x, y, orientation)
-  Slab.SetCursorPos(x-1, y + 8)  
+  Slab.SetCursorPos(x-2, y + 24)  
   if orientation == "SOUTH" then
     Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[LINE_VERTICAL].x, SubY = arrow_quads[LINE_VERTICAL].y, SubW = arrow_quads[LINE_VERTICAL].w, SubH = arrow_quads[LINE_VERTICAL].h})
   elseif orientation == "EAST" then
@@ -96,7 +96,7 @@ end
 
 -- draws the path origin with the specified orientation, using the arrow_tileset
 function draw_origin(x, y, orientation)
-  Slab.SetCursorPos(x-1, y + 8)  
+  Slab.SetCursorPos(x-2, y + 24)  
   if orientation == "SOUTH" then
     Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ORIGIN_SOUTH].x, SubY = arrow_quads[ORIGIN_SOUTH].y, SubW = arrow_quads[ORIGIN_SOUTH].w, SubH = arrow_quads[ORIGIN_SOUTH].h})
   elseif orientation == "NORTH" then
@@ -111,7 +111,7 @@ end
 
 -- draws the last step in the drawn path (the arrow) with the specified orientation, from the arrow_tileset
 function draw_destination(x, y, orientation)
-  Slab.SetCursorPos(x-1, y + 8)  
+  Slab.SetCursorPos(x-2, y + 24)  
   if orientation == "SOUTH" then
   Slab.Image('Path', { Image = arrow_tiles , SubX = arrow_quads[ARROW_SOUTH].x, SubY = arrow_quads[ARROW_SOUTH].y, SubW = arrow_quads[ARROW_SOUTH].w, SubH = arrow_quads[ARROW_SOUTH].h})
   elseif orientation == "NORTH" then
@@ -239,7 +239,7 @@ function love.load(args)
   maze_quads = {}
   for i=0, maze_rows do
     for j=0, maze_cols do
-      table.insert(maze_quads, {x = j * width, y = i * height, w = width, h = height})
+      table.insert(maze_quads, {x = j * width, y = i * height, w = width-1, h = height})
     end
   end
   arrow_quads = {}
@@ -271,8 +271,9 @@ function game_draw()
       Slab.SameLine()
       Slab.Text("\tSteps: " .. current_move)
   end
+  Slab.Separator()
   Slab.Text("Keys: [SPACE] -> Execute one step \t [ENTER] -> Execute full path \t [BACKSPACE] -> Backtrack one step \t [DELETE] -> Backtrack all steps")
-  
+  Slab.Separator()
   for i,row in ipairs(tilemap) do
     for j,tile in ipairs(row) do
       Slab.Image('Tiles', { Image = maze_tiles , SubX = maze_quads[tile].x, SubY = maze_quads[tile].y, SubW = maze_quads[tile].w, SubH = maze_quads[tile].h})
@@ -281,7 +282,7 @@ function game_draw()
       Slab.SetCursorPos(x-4, y)
       if type(maze:get_maze()[i][j]) == "number" or maze:get_maze()[i][j] == "f" then
           x,y = Slab.GetCursorPos()
-          Slab.SetCursorPos(x-32, y)
+          Slab.SetCursorPos(x-31, y)
           Slab.Text(maze:get_maze()[i][j], {Color = {0,0,0}})
           Slab.SameLine()
           Slab.SetCursorPos(x, y)
