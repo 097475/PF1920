@@ -30,7 +30,7 @@ function bruteforce(maze, entry_point_encoded, exit_y, exit_x)
       current_path[node] = nil
       move_sequence[#move_sequence] = nil
     else
-      local available_moves = move_encode(node, maze)
+      local available_moves = generate_next_states(node, maze)
       for next_state, values in pairs(available_moves) do    
         if current_path[next_state] == nil then
           current_path[next_state] = true
@@ -43,8 +43,6 @@ function bruteforce(maze, entry_point_encoded, exit_y, exit_x)
     end
   end
   
-  
-  maze = maze:get_maze()
   local current_path = create_hashtable()
   current_path[entry_point_encoded] = true
   expand_node(entry_point_encoded, current_path, {})
@@ -84,7 +82,7 @@ function find_all_paths(maze, entry_point_encoded, exit_y, exit_x)
         return current
       end
       
-      local available_moves = move_encode(current, maze)
+      local available_moves = generate_next_states(current, maze)
       for next_state, values in pairs(available_moves) do
         if visited[next_state] == nil then
           if open[next_state] == nil then
@@ -104,11 +102,7 @@ function find_all_paths(maze, entry_point_encoded, exit_y, exit_x)
       open[current] = nil
       return breadth_first_search(queue, open ,visited)
     end
-    
-    
-    
-    
-  maze = maze:get_maze()
+  
   local queue = Queue:new()
   local open = create_hashtable()
   queue:enqueue(entry_point_encoded)
@@ -146,7 +140,7 @@ function astar(maze, entry_point_encoded, exit_y, exit_x)
         if current_x == exit_x and current_y == exit_y then
           return current, closed -- last state, and hashmap with path to rebuild
         else
-          local available_moves = move_encode(current, maze)
+          local available_moves = generate_next_states(current, maze)
           for next_state, values in pairs(available_moves) do
             local next_life, next_x, next_y = decode(next_state)
             local next_state_values = { g = current_values.g + 1, h = manhattan(next_x, next_y, exit_x, exit_y), move = values.move, life_change = values.life_change }
@@ -169,7 +163,6 @@ function astar(maze, entry_point_encoded, exit_y, exit_x)
     end
   end
 
-  maze = maze:get_maze()
   local open = create_hashtable()
   local closed = create_hashtable()
   local queue = PriorityQueue.new(function(a, b) return ((a.g + a.h > b.g + b.h) or ((a.g + a.h == b.g + b.h) and a.life_change > b.life_change))  end)
@@ -190,7 +183,7 @@ function bfs(maze, entry_point_encoded, exit_y, exit_x)
     local life, x, y = decode(last_cell)
     if x == exit_x and y == exit_y then return last_cell, path end
         
-    local available_moves = move_encode(last_cell, maze)
+    local available_moves = generate_next_states(last_cell, maze)
     for move, direction_life_difference in pairs(available_moves) do
         move_life, move_x, move_y = decode(move)
         if not visited[move] and move_life > 0 then
@@ -203,7 +196,7 @@ function bfs(maze, entry_point_encoded, exit_y, exit_x)
     end
     return _bfs(paths_queue, last_cells, visited)
   end
-  maze = maze:get_maze()
+
   local visited = create_hashtable()
   local paths_queue = Queue:new()
   local last_cells = Queue:new()
@@ -220,7 +213,7 @@ end
 
 
 --recursive dfs
-function rec_dfs(maze_metatable, entry_point_encoded, exit_y, exit_x)
+function rec_dfs(maze, entry_point_encoded, exit_y, exit_x)
   
   local visited = create_hashtable()
   
@@ -229,7 +222,7 @@ function rec_dfs(maze_metatable, entry_point_encoded, exit_y, exit_x)
     if x == exit_x and y == exit_y then
       return current_cell_encoded, current_path end
     
-    local available_moves = move_encode(current_cell_encoded, maze_grid)
+    local available_moves = generate_next_states(current_cell_encoded, maze_grid)
     for move, direction_life_difference in pairs(available_moves) do
       move_life, move_x, move_y = decode(move)
       if not visited[move] and move_life > 0 and current_path[move] == nil then
@@ -242,7 +235,6 @@ function rec_dfs(maze_metatable, entry_point_encoded, exit_y, exit_x)
     visited[current_cell_encoded] = true
   end
 
-  local maze = maze_metatable:get_maze()
   local path = create_hashtable()
   path[entry_point_encoded] = {move = "", life_change = 0}
   return gen_path(_rec_dfs(entry_point_encoded, path, maze))
@@ -250,10 +242,9 @@ end
 
 
 --DIJKSTRA
-function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
+function dijkstra(maze, entry_point_encoded, exit_y, exit_x)
     local entry_life, entry_x, entry_y = decode(entry_point_encoded)
-    local maze = maze_metatable:get_maze()
-    local walkable_cells = maze_metatable:get_walkable_cells()
+    local walkable_cells = maze:get_walkable_cells()
     local distances = {}
     local cells = {}
     for i = 1,#walkable_cells do
@@ -291,7 +282,7 @@ function dijkstra(maze_metatable, entry_point_encoded, exit_y, exit_x)
         table.remove(cells, cell_index)
         
 
-        local available_moves = move_encode(encode(cell.life, cell.x, cell.y), maze)
+        local available_moves = generate_next_states(encode(cell.life, cell.x, cell.y), maze)
 
         for move, direction_life_difference in pairs(available_moves) do
             local move_life, move_x, move_y = decode(move)
