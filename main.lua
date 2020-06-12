@@ -14,17 +14,6 @@ width = 32
 height = 32
 
 -- tilesets: just insert the tileset path
---TILES = "scifitiles-sheet.png"
--- tilesets: just put the corresponding tile number
---NOWALL = 21
---WALL = 5
---PIT = 18
---ENTRANCE = 4
---EXIT = 59
--- tilesets: rows and columns of the tileset
---tiles_rows = 5
---tiles_cols = 13
-
 TILES = "graphics/maze_tileset.png"
 -- tilesets: just put the corresponding tile number
 NOWALL = 1
@@ -59,23 +48,24 @@ arrow_rows = 2
 arrow_cols = 7
 
 -- global variables
---local start
---local index
---local life
---local current_move
---local history 
---local maze
---local open_no_solution_dialog
---local open_dialog
---local save_dialog
---local filepath
---local maze_tiles
---local maze_quads
---local arrow_tiles
---local arrow_quads
---local algorithm_label
+local start
+local index
+local life
+local current_move
+local history 
+local maze
+local open_no_solution_dialog
+local open_dialog
+local save_dialog
+local filepath
+local maze_tiles
+local maze_quads
+local arrow_tiles
+local arrow_quads
+local algorithm_label
 
--- draws a line at x,y with the specified orientation, using the arrow_tileset
+-- input: x coordinate, y coordinate and orientation from  "SOUTH", "EAST",  "SOUTHEAST",  "SOUTHWEST", "NORTHEAST", "NORTHWEST"
+-- output: none, draws a line at x,y with the specified orientation, using the arrow_tileset
 function draw_line(x, y, orientation)
   Slab.SetCursorPos(x-1, y + 24)  
   if orientation == "SOUTH" then
@@ -93,7 +83,8 @@ function draw_line(x, y, orientation)
   end 
 end
 
--- draws the path origin with the specified orientation, using the arrow_tileset
+-- input: x coordinate, y coordinate and orientation from "EAST", "NORTH", "SOUTH", "WEST"
+-- output: none, draws the path origin with the specified orientation, using the arrow_tileset
 function draw_origin(x, y, orientation)
   Slab.SetCursorPos(x-1, y + 24)  
   if orientation == "SOUTH" then
@@ -107,8 +98,8 @@ function draw_origin(x, y, orientation)
   end  
 end
 
-
--- draws the last step in the drawn path (the arrow) with the specified orientation, from the arrow_tileset
+-- input: x coordinate, y coordinate and orientation from "EAST", "NORTH", "SOUTH", "WEST"
+-- output: none, draws the last step in the drawn path (the arrow) with the specified orientation, from the arrow_tileset
 function draw_destination(x, y, orientation)
   Slab.SetCursorPos(x-1, y + 24)  
   if orientation == "SOUTH" then
@@ -122,7 +113,8 @@ function draw_destination(x, y, orientation)
   end
 end
 
--- Draws the path represented by history up to current_move
+--input: history table with moves to be drawn, index of the last move to draw e.g. ({{move="D", life_change=1}, {move="R", life_change=-2}, {move="R", life_change=3}}, 2) will draw the first two moves in the table
+--output: none, draws the path represented by history up to current_move
 function draw_moves(history, current_move)
   local i = 0
   local current_x, current_y = start.entry_point.x, start.entry_point.y
@@ -177,10 +169,13 @@ function draw_moves(history, current_move)
   end
 end
 
-
--- Converts a maze to a matrix of tile numbers, using the maze as functor
+--input: maze table
+--output: transformed copy of input table where each element is replaced by its corresponding tile number
+--[PURE]
 function generate_tilemap(maze)
-  -- Function that maps each element of the maze to the corresponding tile number [PURE]
+  --input: single element of the maze matrix e.g. "p", 1, "u", 9, etc.
+  --output: corresponding tile number e.g. 7, 1, 6, 1, etc.
+  --[PURE]
   function mapper (element)
     if element == "p" then
       return PIT
@@ -198,13 +193,15 @@ function generate_tilemap(maze)
 end
 
 
--- resets life to initial life, index is reset to 0 to restart the life calculation from start
+--input: none
+--output: none, resets life to initial life, index is reset to 0 to restart the life calculation from start
 function reset_vitality() 
   life = start.initial_life
   index = 0
 end
 
--- resets life and also resets the history, selected algorithm and current move
+--input: none
+--output: none, resets life and also resets the history and the current move
 function total_reset()
   reset_vitality()
   history = nil
@@ -212,25 +209,26 @@ function total_reset()
 end
 
 
--- loads indexes and values when a new maze is selected
--- program entry point is here
+
+--input: none
+--output: none, loads indexes and values when a new maze is selected
 function game_load()
   start, maze = init_game_data(filepath)
   tilemap = generate_tilemap(maze):get_maze()
   total_reset()
 end
 
-
--- runs the solving algorithm, opens a dialog if no solution is found
+--input: function String -> History that given a file path returns the sequence of moves to solve the maze
+--output: none, runs the solving algorithm, opens a dialog if no solution is found
 function run_algorithm(selected_algorithm)
     total_reset()
     history = create_solver(selected_algorithm)(filepath)
     if not history then open_no_solution_dialog = true end
 end
 
-
--- love specific function: called only once at start of the program
--- loads indexes and values that are global for the program, loads up graphics, sets window size
+--input: args (not used)
+--output:none, love specific function: called only once at start of the program
+--loads indexes and values that are global for the program, loads up graphics, sets window size
 function love.load(args)
   filepath = nil
   maze_tiles = love.graphics.newImage(TILES)
@@ -253,8 +251,8 @@ function love.load(args)
   Slab.Initialize(args)
 end
 
-
--- updates the life value
+--input: none
+--output: none, updates the life value to the current step of the path
 function game_update() 
   while index < current_move and history do
     index = index + 1
@@ -262,7 +260,8 @@ function game_update()
   end
 end
 
--- function that draws the actual window contents: the maze and the path
+--input: none
+--output: none, function that draws the actual window contents: the maze and the path, labels, life
 function game_draw() 
   if algorithm_label then Slab.Text("Solver : " .. algorithm_label.. "\t") Slab.SameLine() end
   Slab.Text("Life: " .. life)
@@ -295,7 +294,8 @@ function game_draw()
   end
 end
 
--- menu bar creation
+--input: none
+--output: none, creates the menu bar and manages the various dialogs
 function create_menu()
   if Slab.BeginMainMenuBar() then
     if Slab.BeginMenu("File") then
@@ -377,7 +377,8 @@ function create_menu()
 end
 
 
--- love specific function: called in loop before love.draw
+--input: time passed since last function call
+-- output: none, love specific function: called in loop before love.draw
 -- the function sets up windows and images to be drawn by the Slab library, and also updates vitality and reads key presses
 function love.update(dt)
   Slab.Update(dt)
@@ -394,14 +395,15 @@ function love.update(dt)
 end
 
 
--- love specific function: called in loop after love.update
--- the function calls Slab to draw the windows set up in love.update
+--input: none
+--output: none, love specific function: called in loop after love.update
+--the function calls Slab to draw the windows set up in love.update
 function love.draw()
   Slab.Draw()  
 end
 
--- function to parse user key presses
--- takes input from outside
+--input: none
+--output: none, function to parse user key presses
 function user_input()
      if Slab.IsKeyPressed("space") and current_move < #history then
         current_move = current_move + 1
