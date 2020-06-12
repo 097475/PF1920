@@ -130,7 +130,7 @@ function update_life(life, cell)
     [7] = function(x) return x - 3 end,
     [8] = function(x) return x - 4 end,
     [9] = function(x) return x * 2 end,
-    f = function(x) return (x / 2) < 1 and 0 or x / 2 end,
+    f = function(x) return math.floor(x / 2) end,
     p = function(x) return 0 end
   }
   return rules[cell](life)

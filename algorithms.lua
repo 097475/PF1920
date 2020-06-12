@@ -11,7 +11,7 @@ fun = require 'lib/fun'
     return fun.reduce(function(acc, x) return acc + x.life_change end ,start_life, path)
   end
   
-    function find_best_path(paths, life)
+  function find_best_path(paths, life)
     local feasible_paths = fun.filter(function(path) return calculate_path_value(path, life) > 0 end, paths)
     return not fun.is_null(feasible_paths) and fun.min_by(function(a, b) if #a < #b or (#a == #b and calculate_path_value(a, life) < calculate_path_value(b, life)) then return a else return b end end, feasible_paths) or nil
   end
@@ -353,7 +353,7 @@ end
 
 
 --local path, _history = dijkstra(maze,initial_state(start),4,6)
---astar(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
+--find_all_paths(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 
 --write_maze("test2.lua", start, maze, best_history)
 --local final, history = rec_dfs(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x)
@@ -369,7 +369,7 @@ end
   
 --end
 
---local t = create_solver(astar)("mazes/maze_1.txt")
+--local t = create_solver(bruteforce)("mazes/maze_1.txt")
 --print(t)
 --bruteforce(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
 --find_all_paths(maze, initial_state(start), start.exit_points[1].y, start.exit_points[1].x )
