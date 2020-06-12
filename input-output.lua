@@ -29,7 +29,7 @@ function write_maze(filepath, start, maze, history)
   
   --input: maze, history, current x, current y, current life
   --output: final life, maze_output is modified by side effect
-  function write_path(maze_output, history, x, y, life)
+  local function write_path(maze_output, history, x, y, life)
     local move = history:head()
     local tail = history:tail()
     if tail:is_null() then return life
