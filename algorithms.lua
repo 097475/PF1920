@@ -2,7 +2,7 @@ require "input-output"
 require "maze"
 require "maze_functions"
 require "lib/queue"
-require "tbl"
+require "table_functions"
 require "lib/priority_queue"
 require "hashtable"
 fun = require 'lib/fun'
@@ -225,7 +225,7 @@ function rec_dfs(maze, entry_point_encoded, exit_y, exit_x)
     for move, direction_life_difference in pairs(available_moves) do
       move_life, move_x, move_y = decode(move)
       if not visited[move] and move_life > 0 and current_path[move] == nil then
-          local new_path = copy_hashtable(current_path)
+          local new_path = copy_hashtable (current_path)
           new_path[move] = direction_life_difference
           local final, history = _rec_dfs(move, new_path, maze_grid)
           if final and history then return final, history end

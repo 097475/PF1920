@@ -1,14 +1,18 @@
+--input: none
+--output: new hashtable table
+--[PURE]
 function create_hashtable()
     local hashtable = {}
-    return setmetatable(hashtable, {__index = function(tab, key) return rawget(tab, string.match(key, "|(.*)")) end, __newindex = function(tab, key, value) rawset(tab, string.match(key, "|(.*)"), value)  end})
+    return setmetatable(hashtable, {__index = function(self, key) return rawget(self, string.match(key, "|(.*)")) end, __newindex = function(self, key, value) rawset(self, string.match(key, "|(.*)"), value)  end})
 end
 
+--input: hashtable table
+--output: copy of input table
+--[PURE]
 function copy_hashtable(hashtable)
     local new_hashtable = create_hashtable()
     for k, v in pairs(hashtable) do
-        local new_key = "0|" .. k
-        new_hashtable[new_key] = v
+        rawset(new_hashtable, k, v)
     end
-
     return new_hashtable
 end
