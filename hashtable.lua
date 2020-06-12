@@ -3,7 +3,14 @@
 --[PURE]
 function create_hashtable()
     local hashtable = {}
-    return setmetatable(hashtable, {__index = function(self, key) return rawget(self, string.match(key, "|(.*)")) end, __newindex = function(self, key, value) rawset(self, string.match(key, "|(.*)"), value)  end})
+    return setmetatable(hashtable, {
+        __index = function(self, key)
+                    return rawget(self, string.match(key, "|(.*)"))
+                  end,
+        __newindex = function(self, key, value)
+                        rawset(self, string.match(key, "|(.*)"), value)
+                      end
+        })
 end
 
 --input: hashtable table
