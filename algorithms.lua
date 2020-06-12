@@ -353,7 +353,7 @@ end
 
 
 --input: function to use to solve the maze
---output: function filepath -> History that given a file path returns the sequence of moves to solve the maze
+--output: function String -> History that given a file path returns the sequence of moves to solve the maze
 --[PURE]
 function create_solver(algorithm)
   
