@@ -36,7 +36,7 @@ function move_vector(move)
   end
 
 -- input: state string final, hash table tree e.g. "5|3|2", {"5|3|2" = {move="R", life_change=-2}, "5|2|2" = {move="D", life_change=1}, "5|2|1" = {move="", life_change=0}}
--- output: table representing the steps taken in the path using DULR and life change at each step e.g. {{move="", life_change=0}, {move="D", life_change=1}, {move="R", life_change=-2} }
+-- output: table representing the steps taken in the path using DULR and life change at each step e.g. {{move="", life_change=0}, {move="D", life_change=1}, {move="R", life_change=-2} } or nil if there is no path
 -- [PURE]
 function gen_path(final, tree)
   

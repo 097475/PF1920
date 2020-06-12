@@ -24,7 +24,7 @@ function print_table(tab)
 end
 
 -- input: filepath, start table, maze functor, history
- -- output: writing file with maze modified with * except for "i" and "u"
+-- output: writing file with maze modified with * except for "i" and "u"
 function write_maze(filepath, start, maze, history)
   
   --input: maze, history, current x, current y, current life

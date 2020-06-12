@@ -314,7 +314,7 @@ function create_menu()
     if Slab.BeginMenu("Solve") then
       if Slab.MenuItem("Depth-First Search")  and maze then
         algorithm_label = "Depth-First Search"
-        run_algorithm(rec_dfs)
+        run_algorithm(dfs)
       end
       if Slab.MenuItem("Breadth-First Search") and maze then
         algorithm_label = "Breadth-First Search"
@@ -322,7 +322,7 @@ function create_menu()
       end  
       if Slab.MenuItem("Find-All-Paths") and maze then
         algorithm_label = "Find-All-Paths"
-        run_algorithm(find_all_paths)
+        run_algorithm(find_all_shortest_paths)
       end  
       if Slab.MenuItem("Bruteforce") and maze then
         algorithm_label = "Bruteforce"
