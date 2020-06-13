@@ -321,7 +321,7 @@ function create_menu()
         run_algorithm(bfs)
       end  
       if Slab.MenuItem("Find-All-Paths") and maze then
-        algorithm_label = "Find-All-Paths"
+        algorithm_label = "Find-All-Shortest-Paths"
         run_algorithm(find_all_shortest_paths)
       end  
       if Slab.MenuItem("Bruteforce") and maze then
