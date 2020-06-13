@@ -300,7 +300,7 @@ function dijkstra(maze, entry_point_encoded, exit_x, exit_y)
 
       local cell, distance = priority_queue:Pop()
       --if a cell life is nil, that means that maze has no solution
-      if cell.life == nil then return nil, nil end
+      if cell.life == nil then return nil end
       
       --retrieve index from cells table
       local cell_index = nil
