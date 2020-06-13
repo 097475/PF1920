@@ -270,86 +270,77 @@ end
 -- output: a path table which represents the solution of the maze or nil if there isn't one
 -- [PURE]
 function dijkstra(maze, entry_point_encoded, exit_x, exit_y)
-    local entry_life, entry_x, entry_y = decode(entry_point_encoded)
-    local walkable_cells = maze:get_walkable_cells()
-    local distances = {}
-    local cells = {}
-    for i = 1,#walkable_cells do
-        cells[i] = {}
-        cells[i].x = walkable_cells[i].x
-        cells[i].y = walkable_cells[i].y
-        cells[i].previous = nil
-        if entry_x == walkable_cells[i].x and entry_y == walkable_cells[i].y then
-            distances[i] = 0
-            cells[i].life = entry_life
-            cells[i].direction_life_difference = {move = "", life_change = 0}
-        else 
-            distances[i] = math.huge
-            cells[i].life = nil
-            cells[i].direction_life_difference = nil
-        end
-    end
-    local priority_queue = PriorityQueue:CreateFromTables(cells, distances)
-    local visited = {}
-    
-    while priority_queue:Size() > 0 do
+  local entry_life, entry_x, entry_y = decode(entry_point_encoded)
+  local walkable_cells = maze_metatable:get_walkable_cells()
+  --preparation of tables for building priority queue
+  local distances = {}
+  local cells = {}
+  for i = 1,#walkable_cells do
+      cells[i] = {}
+      cells[i].x = walkable_cells[i].x
+      cells[i].y = walkable_cells[i].y
+      --entry point has defined distance, life and direction_life_difference
+      if entry_x == walkable_cells[i].x and entry_y == walkable_cells[i].y then
+          distances[i] = 0
+          cells[i].life = entry_life
+          cells[i].direction_life_difference = {move = "", life_change = 0}
+      --others are initialized with huge distance
+      else 
+          distances[i] = math.huge
+          cells[i].life = nil
+          cells[i].direction_life_difference = nil
+      end
+  end
+  local priority_queue = PriorityQueue:CreateFromTables(cells, distances)
 
-        local cell, distance = priority_queue:Pop()
-        --if a cell life is nil, that means that maze has no solution
-        if cell.life == nil then return nil, nil end
-        
-        --retrieve index from cells table
-        local cell_index = nil
-        for k,v in pairs(cells) do
-            if v.x == cell.x and v.y == cell.y then cell_index = k break end
-        end
-        assert(cell_index ~= nil, "This cell does not exist in the cells table.")
+  --hashtable storing visited cells
+  local visited = create_hashtable()
+  
+  while priority_queue:Size() > 0 do
 
-        table.remove(distances, cell_index)
-        table.remove(cells, cell_index)
-        
+      local cell, distance = priority_queue:Pop()
+      --if a cell life is nil, that means that maze has no solution
+      if cell.life == nil then return nil, nil end
+      
+      --retrieve index from cells table
+      local cell_index = nil
+      for k,v in pairs(cells) do
+          if v.x == cell.x and v.y == cell.y then cell_index = k break end
+      end
+      assert(cell_index ~= nil, "This cell does not exist in the cells table.")
 
-        local available_moves = generate_next_states(encode(cell.life, cell.x, cell.y), maze)
+      --update cells and distances tables for remving current cell from priority queue and updating distances too
+      table.remove(distances, cell_index)
+      table.remove(cells, cell_index)
+      
 
-        for move, direction_life_difference in pairs(available_moves) do
-            local move_life, move_x, move_y = decode(move)
-            if move_life > 0 then
-              --retrieve index from cells table
-                local index = nil
-                for k,v in pairs(cells) do
-                    if v.x == move_x and v.y == move_y then index = k break end
-                end
-                if index ~= nil then
-                    if distance + 1 < distances[index] then
-                        distances[index] = distance + 1
-                        cells[index].direction_life_difference = direction_life_difference
-                        cells[index].life = move_life
-                        cells[index].previous = encode(cell.life, cell.x, cell.y)
-                    end
-                end
-                
+      local available_moves = generate_next_states(encode(cell.life, cell.x, cell.y), maze)
+
+      for move, direction_life_difference in pairs(available_moves) do
+        local move_life, move_x, move_y = decode(move)
+        if move_life > 0 then
+          --retrieve index from cells table
+            local index = nil
+            for k,v in pairs(cells) do
+                if v.x == move_x and v.y == move_y then index = k break end
             end
+            if index ~= nil then
+              --since the graph is not weighted, the increment of distance from a previous cell is 1
+              if distance + 1 < distances[index] then
+                distances[index] = distance + 1
+                cells[index].direction_life_difference = direction_life_difference
+                cells[index].life = move_life
+              end
+            end   
         end
-        priority_queue = PriorityQueue:CreateFromTables(cells, distances)
-        table.insert(visited, {encode(cell.life, cell.x, cell.y), cell.direction_life_difference, cell.previous})
-        if cell.x == exit_x and cell.y == exit_y then
-            local reversed_history = create_hashtable()
-            local current_cell = visited[#visited]
-            local previous = current_cell[3]
-            while previous ~= nil do
-                reversed_history[current_cell[1]] = current_cell[2]
-                for _,k in pairs(visited) do
-                    if previous == k[1] then
-                        current_cell = k
-                        previous = k[3]
-                    end
-                end
-            end
-            reversed_history[visited[1][1]] = visited[1][2]
-            return gen_path(encode(cell.life, cell.x, cell.y), reversed_history)
-        end
-    end
+      end
+      priority_queue = PriorityQueue:CreateFromTables(cells, distances)
+      visited[encode(cell.life, cell.x, cell.y)] = cell.direction_life_difference
+
+      if cell.x == exit_x and cell.y == exit_y then return gen_path(encode(cell.life, cell.x, cell.y), visited) end
+  end
 end
+
 
 
 --input: function to use to solve the maze
