@@ -31,10 +31,11 @@ function bruteforce(maze, entry_point_encoded, exit_x, exit_y)
   local paths = {}
   local current_path = create_hashtable()
   current_path[entry_point_encoded] = true
+  local move_sequence = {}
   
   --input: encoded initial state, empty table that will contain the sequences of moves for a given path
   --output: none, paths table modified by side effect
-  local function expand_node(node, move_sequence)
+  local function expand_node(node)
     local life, current_x, current_y = decode(node)
     if current_x == exit_x and current_y == exit_y then
       paths[#paths+1] = table.copy(move_sequence)
@@ -46,7 +47,7 @@ function bruteforce(maze, entry_point_encoded, exit_x, exit_y)
         if current_path[next_state] == nil then
           current_path[next_state] = true
           move_sequence[#move_sequence + 1] = values
-          expand_node(next_state, move_sequence)
+          expand_node(next_state)
         end
       end
     current_path[node] = nil
@@ -55,7 +56,7 @@ function bruteforce(maze, entry_point_encoded, exit_x, exit_y)
   end
   
 
-  expand_node(entry_point_encoded, {})
+  expand_node(entry_point_encoded)
   
   local life, _, _ = decode(entry_point_encoded)
   return find_best_path(paths, life)
