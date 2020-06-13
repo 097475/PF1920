@@ -74,10 +74,10 @@ function Stack:Create()
 end
 
 -- create stack
-stack = Stack:Create()
+--stack = Stack:Create()
 
 -- push values on to the stack
-stack:push("a", "b")
+--stack:push("a", "b")
 --print(stack:getn())
 -- pop values
 --stack:list()

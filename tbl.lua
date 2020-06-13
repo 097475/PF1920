@@ -1,3 +1,6 @@
+--input: table, value 
+-- output: compare a value with the elements of a table and returns true if the element is present in the table otherwise false 
+--[PURE]
 function table.contains(tbl, e)
     for _, v in pairs(tbl) do
       
@@ -9,6 +12,9 @@ function table.contains(tbl, e)
     return false
 end
 
+--input: table
+--output: returns a copy of the table inserted as a parameter
+--[PURE]
 function table.copy(tbl)
     local t = {}
 
@@ -19,6 +25,9 @@ function table.copy(tbl)
     return t
 end
 
+--input: table
+--output: returns a reverse of the table inserted as a parameter
+--[PURE]
 function table.reverse(tbl)
   local t = {}
   for i = #tbl, 1, -1 do
