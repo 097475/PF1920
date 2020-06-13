@@ -10,42 +10,42 @@ require "algorithms"
 local Slab = require 'lib/Slab'
 
 -- tilesets: size of a single tile
-width = 32
-height = 32
+local width = 32
+local height = 32
 
 -- tilesets: just insert the tileset path
-TILES = "graphics/maze_tileset.png"
+local TILES = "graphics/maze_tileset.png"
 -- tilesets: just put the corresponding tile number
-NOWALL = 1
-WALL = 2
-PIT = 7
-ENTRANCE = 5
-EXIT = 6
+local NOWALL = 1
+local WALL = 2
+local PIT = 7
+local ENTRANCE = 5
+local EXIT = 6
 
 -- tilesets: rows and columns of the tileset
-maze_rows = 2
-maze_cols = 3
+local maze_rows = 2
+local maze_cols = 3
 
 -- tilesets: just insert the tileset path
-ARROWS = "graphics/arrow_tileset.png"
+local ARROWS = "graphics/arrow_tileset.png"
 -- tilesets: just put the corresponding tile number
-ORIGIN_NORTH = 1
-ORIGIN_SOUTH = 2
-ORIGIN_WEST = 3
-ORIGIN_EAST = 4
-LINE_VERTICAL = 5
-LINE_HORIZONTAL = 6
-LINE_NORTH_EAST = 7
-LINE_SOUTH_WEST = 9
-LINE_NORTH_WEST = 10
-LINE_SOUTH_EAST = 11
-ARROW_NORTH = 12
-ARROW_EAST = 13
-ARROW_SOUTH = 14
-ARROW_WEST = 15
+local ORIGIN_NORTH = 1
+local ORIGIN_SOUTH = 2
+local ORIGIN_WEST = 3
+local ORIGIN_EAST = 4
+local LINE_VERTICAL = 5
+local LINE_HORIZONTAL = 6
+local LINE_NORTH_EAST = 7
+local LINE_SOUTH_WEST = 9
+local LINE_NORTH_WEST = 10
+local LINE_SOUTH_EAST = 11
+local ARROW_NORTH = 12
+local ARROW_EAST = 13
+local ARROW_SOUTH = 14
+local ARROW_WEST = 15
 -- tilesets: rows and columns of the tileset
-arrow_rows = 2
-arrow_cols = 7
+local arrow_rows = 2
+local arrow_cols = 7
 
 -- global variables
 local start
