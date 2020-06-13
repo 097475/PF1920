@@ -299,8 +299,15 @@ function dijkstra(maze, entry_point_encoded, exit_x, exit_y)
   while priority_queue:Size() > 0 do
 
       local cell, distance = priority_queue:Pop()
+      --consider current cell as visited
+      visited[encode(cell.life, cell.x, cell.y)] = cell.direction_life_difference
+
       --if a cell life is nil, that means that maze has no solution
-      if cell.life == nil then return nil end
+      if cell.life == nil then 
+        return nil
+      elseif cell.x == exit_x and cell.y == exit_y then 
+        return gen_path(encode(cell.life, cell.x, cell.y), visited) 
+      end
       
       --retrieve index from cells table
       local cell_index = nil
@@ -335,9 +342,7 @@ function dijkstra(maze, entry_point_encoded, exit_x, exit_y)
         end
       end
       priority_queue = PriorityQueue:CreateFromTables(cells, distances)
-      visited[encode(cell.life, cell.x, cell.y)] = cell.direction_life_difference
 
-      if cell.x == exit_x and cell.y == exit_y then return gen_path(encode(cell.life, cell.x, cell.y), visited) end
   end
 end
 
