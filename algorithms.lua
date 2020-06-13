@@ -271,7 +271,7 @@ end
 -- [PURE]
 function dijkstra(maze, entry_point_encoded, exit_x, exit_y)
   local entry_life, entry_x, entry_y = decode(entry_point_encoded)
-  local walkable_cells = maze_metatable:get_walkable_cells()
+  local walkable_cells = maze:get_walkable_cells()
   --preparation of tables for building priority queue
   local distances = {}
   local cells = {}
