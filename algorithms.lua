@@ -284,7 +284,7 @@ function dijkstra(maze, entry_point_encoded, exit_x, exit_y)
             cells[i].life = entry_life
             cells[i].direction_life_difference = {move = "", life_change = 0}
         else 
-            distances[i] = 10000
+            distances[i] = math.huge
             cells[i].life = nil
             cells[i].direction_life_difference = nil
         end
