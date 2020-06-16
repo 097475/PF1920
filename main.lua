@@ -224,9 +224,8 @@ end
 --output: none, runs the solving algorithm, opens a dialog if no solution is found
 function run_algorithm(selected_algorithm)
     total_reset()
-    local h = Maybe(create_solver(selected_algorithm)(filepath))
-    h:bind(function(value) history = value end )
-    if not history then open_no_solution_dialog = true end
+    local monad = Maybe(filepath):bind(function(path) return Maybe(create_solver(selected_algorithm)(path)) end):bind(function(value) history = value return Maybe(true) end )
+    if monad.is_null then open_no_solution_dialog = true end
 end
 
 --input: args (not used)
@@ -357,13 +356,13 @@ function create_menu()
   end
   
   if save_dialog then
-    if history then
+    if maze then
       local result = Slab.FileDialog({AllowMultiSelect = false, Type = 'savefile'})
       if result.Button ~= "" then
         save_dialog = false
         if result.Button == "OK" then
           filepath = result.Files[1]
-          write_maze(filepath, start, maze, history)
+          Write(write_maze(start, maze, history)):bind(function(data) write_to_file(filepath, data) return Write(true) end)
         end
       end
     else 
