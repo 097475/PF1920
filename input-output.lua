@@ -25,6 +25,7 @@ end
 
 -- input: filepath, start table, maze functor, history
 -- output: writing file with maze modified with * except for "i" and "u"
+--[PURE]
 function write_maze(start, maze, history)
   
   --input: maze, history, current x, current y, current life
@@ -51,6 +52,7 @@ function write_maze(start, maze, history)
   local final_life = history and write_path(maze_output, fun.iter(history), x, y, start.initial_life  ) or nil
   if final_life == nil then return nil else return {maze=maze_output, life=final_life} end
 end
+
 
 function write_to_file(filepath, data)
   local file = io.open(filepath, "w")
