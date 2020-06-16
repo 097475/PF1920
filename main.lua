@@ -6,6 +6,8 @@ table.unpack = unpack
 require "input-output"
 -- import of algorithms module
 require "algorithms"
+-- import of monad module
+require "monad"
 -- import of Slab library
 local Slab = require 'lib/Slab'
 
@@ -222,7 +224,8 @@ end
 --output: none, runs the solving algorithm, opens a dialog if no solution is found
 function run_algorithm(selected_algorithm)
     total_reset()
-    history = create_solver(selected_algorithm)(filepath)
+    local h = Maybe(create_solver(selected_algorithm)(filepath))
+    h:bind(function(value) history = value end )
     if not history then open_no_solution_dialog = true end
 end
 
